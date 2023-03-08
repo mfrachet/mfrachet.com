@@ -19,7 +19,7 @@ export default function Home() {
         <meta name="description" content={description} />
         <meta property="og:description" content={description} />
 
-        <meta property="og:image" content="/og.png" />
+        <meta property="og:image" content="https://mfrachet.com/og.png" />
         <meta name="twitter:card" content="summary"></meta>
 
         <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 export interface SideProjectProps {
   children: React.ReactNode;
   title: string;
@@ -13,11 +15,15 @@ export const SideProject = ({
   children,
   cta,
 }: SideProjectProps) => {
+  const id = useId();
   return (
-    <div className="flex flex-col md:flex-row gap-4 md:gap-8 bg-slate-800 rounded-lg px-8 py-12">
+    <article
+      aria-labelledby={id}
+      className="border bg-gray-800 border-gray-700 rounded-lg flex flex-col md:flex-row gap-4 md:gap-8 bg-slate-800 rounded-lg px-8 py-12"
+    >
       <div>{logo}</div>
       <div>
-        <h3 className="text-4xl text-slate-50 pb-2 font-bold">
+        <h3 id={id} className="text-4xl text-slate-50 pb-2 font-bold">
           <a
             href={href}
             target="_blank"
@@ -30,6 +36,6 @@ export const SideProject = ({
         {children}
         {cta && <div className="flex flex-row pt-4">{cta}</div>}
       </div>
-    </div>
+    </article>
   );
 };

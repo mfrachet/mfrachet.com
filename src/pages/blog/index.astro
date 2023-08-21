@@ -1,0 +1,29 @@
+---
+import { Container } from "../../components/Container";
+import Layout from "../../layouts/Layout.astro";
+import { Text } from "../../components/Text";
+import { PostList } from "../../modules/posts/components/PostList";
+import { getAllPosts } from "../../modules/posts/services/getAllposts";
+import { PostHighlight } from "../../modules/posts/components/PostHighlight";
+
+const allBlogPosts = await getAllPosts();
+const firstPost = allBlogPosts.shift();
+---
+
+<Layout title="Marvin Frachet's blog">
+  <main>
+    <Container>
+      <Text as="h1" className="text-3xl md:text-4xl pb-4">Blog posts</Text>
+
+      {
+        firstPost && (
+          <div class="motion-safe:animate-fade-enter-bottom pb-4 md:pb-12">
+            <PostHighlight post={firstPost} client:load />
+          </div>
+        )
+      }
+
+      <PostList posts={allBlogPosts} client:visible />
+    </Container>
+  </main>
+</Layout>

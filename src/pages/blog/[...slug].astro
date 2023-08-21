@@ -1,0 +1,66 @@
+---
+import { getEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { Container } from "../../components/Container";
+import { Text } from "../../components/Text";
+import { BackLink } from "../../components/BackLink";
+// 1. Get the slug from the incoming server request
+const { slug } = Astro.params;
+if (slug === undefined) {
+  throw new Error("Slug is required");
+}
+// 2. Query for the entry directly using the request slug
+const entry = await getEntry("blog", slug);
+// 3. Redirect if the entry does not exist
+if (entry === undefined) {
+  return Astro.redirect("/404");
+}
+// 4. (Optional) Render the entry to HTML in the template
+const { Content } = await entry.render();
+
+const cover = `/blog/${entry.slug}_cover.jpg`;
+const formatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
+const formattedDate = formatter.format(entry.data.date);
+---
+
+<Layout title={entry.data.title}>
+  <main>
+    <div class="mx-auto px-4 max-w-3xl">
+      <BackLink href="/blog">Back to blog</BackLink>
+
+      <div
+        class="motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom pt-8 md:pt-20"
+      >
+        <Text as="time" className="!text-stone-400 text-xl pt-4 block ">
+          {formattedDate}
+        </Text>
+      </div>
+
+      <div
+        class="motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
+        style={{ animationDelay: "300ms" }}
+      >
+        <Text as="h1" className="text-3xl md:text-5xl pb-8 font-semibold">
+          {entry.data.title}
+        </Text>
+      </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto">
+      <img
+        src={cover}
+        alt=""
+        class="md:rounded-3xl md:h-[600px] w-full object-cover motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
+        style={{ animationDelay: "500ms" }}
+      />
+    </div>
+  </main>
+
+  <div class="mx-auto px-4 max-w-3xl pt-8 md:pt-12">
+    <div
+      class="prose-code:px-1 prose lg:prose-xl prose-invert md:prose-pre:-mx-10 prose-pre:rounded-xl prose-img:rounded-xl"
+    >
+      <Content />
+    </div>
+  </div>
+</Layout>

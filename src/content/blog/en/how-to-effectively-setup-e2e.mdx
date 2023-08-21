@@ -1,0 +1,97 @@
+---
+title: How to effectively setup E2E tests?
+date: 2023-08-03
+---
+
+From my experience, people tend to think that E2E testing is hard, but in reality, the hardest thing is to make sure to have good foundations to effectively write tests and make them part of your continuous integration pipelines.
+
+Whether you have an already running application or you're about to start one, there is a bunch of things to accomplish before being fully operational.
+
+This blog post will deal with databases and backend that you may not have if you run on static websites. However, most of the content will be applicable in your case anyways.
+
+## Establish good foundations
+
+### Define what is E2E testing as a team
+
+Depending on your overall ecosystem, your team or your project, make sure that everybody has the same definition of E2E testing. I'm saying this because I've seen many people with their definitions of testing automation, but from one person to another, they differ drastically. Make sure everybody is on the same page before starting.
+
+### Define a static dataset
+
+This is probably the most important thing to keep in mind: for your tests to be deterministic, you will need to have a predefined set of data on which you can make expectations that will guarantee the same result.
+
+You don't need an entire dataset, with all the relationships taken into account, nor try to create an exhaustive one for an app running on top of 2k SQL tables.
+
+You don't need everything to be ready from the ground, start small, write your first meaningful tests and iterate from there.
+
+If you have a complex application with multiple personas or different access rights, make sure to have predefined accounts for each of them.
+
+### Create shortcuts for seeding & resetting the database(s)
+
+Since you have a dataset that is ready to be used, make sure to create functions or custom commands that will put the dataset into the database, and also a command to erase the data from the database.
+
+This will be practical to ensure a coherent state between your test runs.
+
+One positive effect of these functions/commands is that if you have a newcomer in your team, they have a predefined set of users to play with.
+
+### Create shortcuts for authenticating your users
+
+You are about to test your applications, and chances are that you will need to be authenticated to perform some actions.
+
+I would highly recommend creating a dedicated function for this specific purpose: make sure it can accept a login, a password or whatever is required to authenticate your user.
+
+Also, be aware that E2E tests take time since they require your whole stack to be started: if you can skip browsing the login page with your E2E test tool and directly get a token from your API with a fetch call, do it, it will speed up your tests run by a significant amount.
+
+## Writing meaningful tests
+
+### Test ~~like a real user~~ effectively
+
+People tend to think that E2E tests should test a whole functionality: I agree and disagree. It depends on the size and number of actions you have to make to perform a specific action, and also on the way you deal with the state of your application in your frontend (state by URL vs in-memory a-la Redux, Zustand and friends...).
+
+I find E2E tests to shine when I focus on a given page instead of focusing on a whole feature itself for the following reasons:
+
+- Easier file system organisation: 1 test file, 1 route
+- You don't test browser APIs (link navigating between pages with `<a>` tags for instance)
+- Less cognitive load, focus on the current page, the scope is clear
+- Easy to shoot accessibility tests per page
+
+It's opinionated, but this is the way I have most enjoyed these last 10 years.
+
+### Test everything in isolation
+
+Make sure that you are in a consistent state between the different test runs. Be sure that your database has good data in good shape to make a meaningful assertion. If you don't pay too much attention, you might enter situations where your tests will be flaky and your expectations may fail sometimes, but pass other times.
+
+One good rule of thumb is to seed and reset your database between tests.
+
+At some point, you will face the problem that we all have had when writing E2E tests: they are slow. And you will feel the urge to not seed and reset your database on every test run. If this is the case, make sure that you test behaviours that can't collide.
+
+### Keep tests simple
+
+The easier it is to read, the easier it is to debug. If a new person joins your team, they should be able to jump on the train without friction.
+
+Keep in mind that for many people, E2E tests are hard. Don't over-abstract, or create unnecessary function indirections for the sake of smartness, keep things simple and scalable. Duplicating code is fine, your colleagues will thank you.
+
+### Query your elements by their role
+
+When writing E2E tests, you make DOM queries to select specific elements and you make assertions on them. For example, you can verify that the title is well set, that when you press that specific button the counter increments etc.
+
+There are debates on how you should query elements on which you want to perform actions or assertions (query by id, by text etc...): my go-to would be to query the element by its role + its content. The positive effect of that is that even if you don't have experience with accessibility, you are already one foot in by making sure you are clicking on a "button" and not a "div" (please, stop putting click events on divs).
+
+## Make them part of your workflow
+
+### Setup your CI
+
+Remember that an E2E test is about spawning your whole application, from one end to the other. You have to start the database(s), the frontend(s) and the backend(s).
+
+If you use Github Actions, I have an example for progressively.app in this file.
+
+Once everything is setup, you can effectively start your E2E tool and play the tests in headless mode.
+
+### Dealing with speed issues
+
+You will face speed issues when running E2E tests in your CI. The first reason is the setup part: you need everything to be up and running and it takes time.
+
+The second reason is that you need your tests to run sequentially on a given machine. You can't parallelize E2E tests on one machine: if you do that, you will encounter an inconsistent state because your data stored in the databases will not be what you were expecting. What if one test tries to assert while the other is currently resetting the database? The test can't pass.
+
+One way to solve this is to run your E2E tests on multiple machines. Group your tests by running speed (don't put two long-running suites in the same group) and spawn your whole environment multiple times on multiple machines. For instance, instead of running only against 1 database, you can now run against 4, seed and reset them independently.
+
+If using Github actions, you can tweak the `matrix` option to achieve this.

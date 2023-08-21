@@ -1,0 +1,74 @@
+---
+title: 10 things about feature flags that will speed-up your workflow
+date: 2023-07-26
+---
+
+I used to work painfully with [Gitflow and feature branches](https://progressively.app/blog/is-gitflow-really-needed) until I realised that what I really needed was [Trunk based Development](https://trunkbaseddevelopment.com/) and **feature flags**.
+
+Don't forget that the goal of a developer is to ship value and Gitflow/feature branches were slowing me down in this regard.
+
+With trunk based development, I create very small branches that lives for a few hours, and each time I merge one in the main branch, the code is deployed to production. To protect users from accessing unfinished features, I use feature flags: each time I want to activate a feature, I just press a button.
+
+How fast is that?
+
+**Here are 10 things about feature flags that will speed-up your workflow.**
+
+## 1. Separate code deployment from feature releases
+
+You can deploy code 20 times a day, and all this code may not act as a fully polished feature. And it's okay because with feature flags, activating a feature to the audience is not tightly bound to your code deployment process: it's just a toggle button that you click in a dashboard to make the feature available to the users.
+
+```jsx
+if (flags.newFeature) {
+  return <NewFeature />;
+}
+
+return <OldFeature />;
+```
+
+## 2. Rollbacks are easy
+
+Almost the same point as above: since the code deployed and the feature are not strictly bound, you can deactivate the feature with just one click and not go through your whole CI/CD pipelines to get back to a valid and running state.
+
+## 3. Test directly in production
+
+In most of the feature flags tools available in the market, you can decide which users can see the new feature and which users can't. It means that you can activate the feature only for your QA team and they will be able to play directly in production.
+
+_Side effect: no discrepancies between environment anymore, it's always the same servers configurations._
+
+## 4. Unlock Canary and Beta releases
+
+Using the same targeting tooling as previously explained, you can create a Canary users group and a Beta users group and activate the feature very early for them.
+
+## 5. Gradual rollout
+
+Let's say you've built a brand new feature, and you don't feel very confident about what you've created. With feature flagging tools, you can increasingly rollout your feature to 1%, 2%, 3%...100% of your audience.
+
+Funny thing is that you can correlate the percentage of rollout with your error tracking tool (such as Sentry) and check if your new feature has increased your error rates.
+
+## 6. The A/B testing side effect
+
+Feature flags are generally used with "true" and "false" values: is the feature activated or not?
+
+By pushing the concept one step further, we can give feature flags multiple values "A", "B", "C" (or whatever) and display different UI/UX of a given feature to a percentage of the audience. You can then measure the amount of actions taken on each of these different views and see which one converts the most.
+
+## 7. Time based rollout
+
+You have something to deploy on Monday at 9am? With feature flagging tools, you can automate that. Since, again, the feature and the code are not tightly bound, the code already exists in production: all you need to do is to create a rule in the dashboard of your tool and at 9am Monday, you'll see your new feature live.
+
+## 8. No impact on web performance with [Progressively](https://progressively.app/)
+
+Progressively is a feature flagging tool and in contrary to other solutions, the client side SDK, that works in real-time, is only 1.3kB.
+
+Stop fearing the slow page loading because of third party tools anymore.
+
+## 9. [Progressively](https://progressively.app/) with SSR and Edge Runtimes
+
+The tool works with SSR frameworks such as Svelte, Qwik, Astro, Nextjs, Remix etc... You don't need to wait for the client side of your app to load and the page to flicker to benefit from a great experience with feature flags.
+
+And if you want to work at an even bigger scale, try to use Progressively inside an Edge Middleware in Vercel ;).
+
+## 10. [Progressively](https://progressively.app/) is FREE
+
+It's open source, and you can self-host it on your own servers. Go to https://github.com/progressively-crew/progressively, follow the instruction and spawn your instance on your own machine, for free.
+
+And if you're not so much on self-hosting, there is a SaaS solution that you can pay to play with.

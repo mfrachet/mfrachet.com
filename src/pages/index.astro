@@ -1,0 +1,91 @@
+---
+import { Card } from "../components/Card";
+import { WhoIAm } from "../modules/WhoIAm";
+import { Text } from "../components/Text";
+import { Container } from "../components/Container";
+import Layout from "../layouts/Layout.astro";
+import meSrc from "../assets/me.jpg";
+import { getAllPosts } from "../modules/posts/services/getAllposts";
+import { PostList } from "../modules/posts/components/PostList";
+import { Link } from "../components/Link";
+
+const POST_TO_SHOW_HOMEPAGE = 3;
+const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
+---
+
+<Layout title="Marvin Frachet, Frontend Engineer">
+  <main>
+    <Container>
+      <div
+        class="py-8 md:py-20 grid md:grid-cols-2 gap-4 md:gap-20 items-center"
+      >
+        <div>
+          <Text
+            as="h1"
+            className="text-3xl md:text-4xl	motion-safe:animate-fade-enter-bottom"
+          >
+            Shipping things fast & testing automation
+          </Text>
+
+          <div
+            class="motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
+            style={{
+              animationDelay: "200ms",
+            }}
+          >
+            <Text
+              as="p"
+              className="text-xl md:text-2xl pt-2 md:pt-4 !text-stone-400"
+            >
+              Also learning about accessibility and trying to launch
+              <a
+                href="https://progressively.app"
+                target="_blank"
+                class="border-b border-stone-300 hover:text-white text-stone-200 hover:pb-1 transition-all"
+                >Progressively</a
+              > on the side.
+            </Text>
+          </div>
+        </div>
+
+        <div class="relative md:pb-20 md:pr-20">
+          <img
+            src={meSrc}
+            alt="Marvin Frachet (me)"
+            class="rounded-3xl relative z-10 md:h-[330px] md:w-[440px] motion-safe:opacity-0 motion-safe:animate-opacity-appearing"
+            style={{
+              animationDelay: "500ms",
+            }}
+          />
+
+          <div
+            aria-hidden
+            class="hidden md:block absolute top-0 h-[330px] w-[440px] motion-safe:opacity-0 motion-safe:animate-card-move"
+            style={{
+              animationDelay: "800ms",
+            }}
+          >
+            <Card>&nbsp;</Card>
+          </div>
+        </div>
+      </div>
+
+      <WhoIAm />
+
+      <section class="pt-8 md:py-20">
+        <div
+          class="flex flex-col md:flex-row md:items-center justify-between pb-4"
+        >
+          <Text as="h2" className="text-2xl md:text-3xl">
+            Latest posts that might interest you
+          </Text>
+
+          <div class="text-xl pt-4 md:pt-0">
+            <Link href="/blog">See all posts</Link>
+          </div>
+        </div>
+        <PostList posts={latestPosts} client:visible />
+      </section>
+    </Container>
+  </main>
+</Layout>

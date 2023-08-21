@@ -1,4 +1,4 @@
-import { PiCaretLeftLight } from "react-icons/pi";
+import { BsChevronLeft } from "react-icons/bs";
 
 export interface BackLinkProps {
   children: React.ReactNode;
@@ -11,7 +11,7 @@ export const BackLink = ({ children, href }: BackLinkProps) => {
       href={href}
       className="group text-stone-300 hover:text-white inline-flex flex-row items-center gap-1"
     >
-      <PiCaretLeftLight
+      <BsChevronLeft
         aria-hidden
         className="group-hover:-translate-x-2 transition-all"
       />

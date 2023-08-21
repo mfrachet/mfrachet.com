@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { PiCaretRightLight } from "react-icons/pi";
+import { BsChevronRight } from "react-icons/bs";
 
 export interface LinkProps {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ export const Link = forwardRef(
         <span className="border-b border-stone-300 group-hover:border-b-white">
           {children}
         </span>
-        <PiCaretRightLight
+        <BsChevronRight
           aria-hidden
           className="group-hover:translate-x-2 transition-all"
         />

@@ -25,7 +25,11 @@ According to [jamstack.org](https://jamstack.org/), we use it because:
 People use A/B testing to measure which variant of a website is more appreciated by their users. The idea is simply to provide different visual representations
 of some data and check which one attracts more people.
 
-![Visual representation of two different variants of an A/B tests](./ab-tests.png)
+<img
+  src="/blog/assets/ab-test-jamstack/1.png"
+  alt="Visual representation of two different variants of an A/B tests"
+  className="bg-white w-full object-contain"
+/>
 
 If the visitors of the variant A come more often than the visitors of the variant B, then we can assume that variant A is a more viable solution to represent the data on the page.
 
@@ -77,7 +81,11 @@ Also note that some tools helping building applications using the JAMstack **don
 
 The JAMstack is about **building static pages**. Taking this notion to the extreme, we can imagine creating a dedicated set of static pages for different variants and host them in different places, like for example, different machines.
 
-![Visual representation of two machines hosting two different variants of an A/B test](./machine-ab.png)
+<img
+  src="/blog/assets/ab-test-jamstack/2.png"
+  alt="Visual representation of two machines hosting two different variants of an A/B test"
+  className="bg-white w-full object-contain"
+/>
 
 **The machine 1** owns all the statically generated HTML pages impacted by the variant A and **the machine 2** owns all of the statically generated HTML pages of the variant B.
 
@@ -99,7 +107,11 @@ The next step is to rely on some kind of proxy to route the different users to o
 
 Remember, **we can't rely on runtime information to store the variant**, like an authenticated user id for example. We need to rely on something else. Hopefully, [HTTP Cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) exist that allow for a client-server kind of data sharing. We can benefit from them to store the actual variant requested by the user and make sure that they will always get routed to that variant.
 
-![Visual representation of a proxy routing an HTTP request to the good machine for an A/B test](./cookie-ab.png)
+<img
+  src="/blog/assets/ab-test-jamstack/3.png"
+  alt="Visual representation of a proxy routing an HTTP request to the good machine for an A/B test"
+  className="bg-white w-full object-contain"
+/>
 
 ## Observations on this approach
 
@@ -109,7 +121,11 @@ The second observation is about the tradeoffs we decided to make: we shifted the
 
 Also note that we need more "places" to put the different variants: 1 variant corresponds to 1 website that corresponds to 1 set of static pages that should entirely be hosted. **The more we have variants, the more we may pay for hosting**:
 
-![A visual representation of a project having 4 different variants](./all-variants.png)
+<img
+  src="/blog/assets/ab-test-jamstack/4.png"
+  alt="A visual representation of a project having 4 different variants"
+  className="bg-white w-full object-contain"
+/>
 
 There's also one side effect that I find positive (but it can feel negative) is that it can be hard to combine multiple A/B experiments.
 

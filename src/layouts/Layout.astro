@@ -1,4 +1,5 @@
 ---
+import { Analytics } from "@vercel/analytics/react";
 import { Banner } from "../components/Banner";
 import { Container } from "../components/Container";
 import { Navbar } from "../components/Navbar";
@@ -68,6 +69,7 @@ const showHiringBanner = await get("showHiringBanner");
       <Navbar />
     </Container>
     <slot />
+    <Analytics />
   </body>
 </html>
 <style is:global>

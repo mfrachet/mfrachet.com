@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { BsChevronRight } from "react-icons/bs";
+import { BsChevronRight } from "react-icons/bs/index";
 
 export interface LinkProps {
   children: React.ReactNode;

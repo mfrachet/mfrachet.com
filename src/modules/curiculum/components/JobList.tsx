@@ -9,7 +9,7 @@ export const JobList = ({ jobs }: JobListProps) => {
   return (
     <div className="grid md:grid-cols-4 gap-4 md:gap-8">
       {jobs.map((job) => (
-        <JobCard job={job} />
+        <JobCard key={job.company} job={job} />
       ))}
     </div>
   );

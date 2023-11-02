@@ -4,7 +4,6 @@ import { Banner } from "../components/Banner";
 import { Container } from "../components/Container";
 import { Navbar } from "../components/Navbar";
 import { Link } from "../components/Link";
-import { get } from "../modules/feature-flags/get";
 
 interface Props {
   title: string;
@@ -16,8 +15,6 @@ const ogImage = "/og.jpeg";
 
 const description =
   "Frontend Engineer building application with React, React Native and TypeScript. I'm navigating the JavaScript world learning new things and meeting amazing people.";
-
-const showHiringBanner = await get("showHiringBanner");
 ---
 
 <!doctype html>
@@ -51,20 +48,19 @@ const showHiringBanner = await get("showHiringBanner");
     <meta name="twitter:image:alt" content={title} />
   </head>
   <body class="min-h-full h-full bg-stone-900 pb-4 md:pb-12">
-    {
-      showHiringBanner && (
-        <Banner>
-          <span aria-label="An orange pumpkin carved into the shape of a face and commonly known as a Jack-o'-lantern">
-            🎃
-          </span>
-          I'm open for opportunities, preferably in Europe & full remote, you
-          can reach out at{" "}
-          <Link href="mailto:marvin@frachet.eu" target="_blank" variant="light">
-            marvin@frachet.eu
-          </Link>
-        </Banner>
-      )
-    }
+    <Banner>
+      <span
+        aria-label="An orange pumpkin carved into the shape of a face and commonly known as a Jack-o'-lantern"
+      >
+        🎃
+      </span>
+       I'm open for opportunities, preferably in Europe & full remote, you can
+      reach out at{" "}
+      <Link href="mailto:marvin@frachet.eu" target="_blank" variant="light">
+        marvin@frachet.eu
+      </Link>
+    </Banner>
+
     <Container>
       <Navbar />
     </Container>

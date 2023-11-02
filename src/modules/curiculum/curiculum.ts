@@ -11,7 +11,7 @@ export const jobs: Array<Job> = [
     description:
       "In the Growth Team, worked on improving the scalability of statically generated websites, using React ecosystem.",
     title: "Senior Frontend engineer",
-    imageUrl: protonSrc,
+    imageUrl: protonSrc.src,
   },
   {
     company: "OpenClassroom",
@@ -19,7 +19,7 @@ export const jobs: Array<Job> = [
     description:
       "In the Engineering Team, mostly implied in Product revamping, using React Ecosystem.",
     title: "Staff Frontend engineer",
-    imageUrl: ocSrc,
+    imageUrl: ocSrc.src,
   },
   {
     company: "Strapi",
@@ -27,7 +27,7 @@ export const jobs: Array<Job> = [
     description:
       "In the Engineering Team, built core functionalities, implemented the Design System library (Strapi v4).",
     title: "Senior Frontend engineer",
-    imageUrl: strapiSrc,
+    imageUrl: strapiSrc.src,
   },
   {
     company: "Gatsby",
@@ -35,6 +35,6 @@ export const jobs: Array<Job> = [
     description:
       "In the Engineering Team, worked on Gatsby Cloud and the build experience, using React Ecosystem",
     title: "Senior Frontend engineer",
-    imageUrl: gatsbySrc,
+    imageUrl: gatsbySrc.src,
   },
 ];

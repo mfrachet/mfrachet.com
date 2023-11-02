@@ -8,7 +8,7 @@ export const WhoIAm = () => {
       <div className="md:grid md:grid-cols-2 gap-4 md:gap-20 items-center">
         <div>
           <img
-            src={me2Src}
+            src={me2Src.src}
             alt="Marvin Fracher (me)"
             className="hidden md:block rounded-3xl h-[390px] w-[520px] motion-safe:opacity-0 motion-safe:animate-opacity-appearing"
             style={{

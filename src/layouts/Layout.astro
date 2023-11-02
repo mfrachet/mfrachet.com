@@ -1,6 +1,8 @@
 ---
 import { Container } from "../components/Container";
 import { Navbar } from "../components/Navbar";
+import { get } from "../modules/feature-flags/get";
+
 interface Props {
   title: string;
 }
@@ -11,9 +13,13 @@ const ogImage = "/og.jpeg";
 
 const description =
   "Frontend Engineer building application with React, React Native and TypeScript. I'm navigating the JavaScript world learning new things and meeting amazing people.";
+
+const showHiringBanner = await get("showHiringBanner");
+
+console.log("hello world", showHiringBanner);
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="min-h-full">
   <head>
     <meta charset="UTF-8" />

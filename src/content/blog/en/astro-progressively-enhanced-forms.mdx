@@ -156,3 +156,34 @@ In this post, we'll create a framework agnostic solution.
 At this point, if you try to submit the form, the page does not refresh anymore. If you check the `network` tab of your browsers devtools, you should see a POST request hitting your current route but resolving a `document`.
 
 Since we are already in the browser, we don't want to receive a complete document. It wouldn't make sense since we would be in the same situation as before. What we want is JSON data that we can use to update the UI.
+
+To achieve that, we need to modify the form handling on the server to return JSON in one case and a whole document in another case:
+
+```astro
+---
+let error: string | undefined;
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  const email = data.get("email")?.toString() || "";
+  const password = data.get("email")?.toString() || "";
+
+  if (!email.includes("@domain.com")) {
+    error = "Invalid email. It should contain @domain.com";
+  }
+
+  // Verify if the request comes from the client or the server
+  const isClientRequest =
+    Astro.request.headers.get("accept") === "application/json";
+
+  // if it comes from the client, return a JSON response with the data
+  if (isClientRequest) {
+    const response = new Response(JSON.stringify({ error }));
+
+    return response;
+  }
+}
+---
+```
+
+If you now try to submit the form again with JavaScript enabled, with your devtools opened, you can see that the fetch request now returns a JSON object with the error. It means that we can deal with this object to update the UI.

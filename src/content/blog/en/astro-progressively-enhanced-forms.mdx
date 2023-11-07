@@ -176,7 +176,7 @@ if (Astro.request.method === "POST") {
   const isClientRequest =
     Astro.request.headers.get("accept") === "application/json";
 
-  // if it comes from the client, return a JSON response with the data
+  // If it comes from the client, return a JSON response with the data
   if (isClientRequest) {
     const response = new Response(JSON.stringify({ error }));
 
@@ -187,3 +187,104 @@ if (Astro.request.method === "POST") {
 ```
 
 If you now try to submit the form again with JavaScript enabled, with your devtools opened, you can see that the fetch request now returns a JSON object with the error. It means that we can deal with this object to update the UI.
+
+### Cleaning up the ground and abstracting
+
+It's already a bunch of code. Let's try to abstract the code from both the client and the server so that we can use it in different places easily.
+
+#### On the client
+
+On the browser, what we want is something as easy as:
+
+```astro
+<script>
+  import { handleClientForm } from "./handleClientForm";
+
+  handleClientForm(document.querySelector("form"));
+</script>
+
+```
+
+We can achieve this by moving most of the `<script>` tag into a dedicated `handleClientForm` function:
+
+```ts
+export const handleClientForm = (form?: HTMLFormElement | null) => {
+  if (!form) return;
+
+  // listen to the submit event of the form
+  form.addEventListener("submit", function (e) {
+    // Avoid to page flickering and deal with the form client side
+    e.preventDefault();
+
+    // fetch the current route instead of using the HTML form submission
+    fetch(form.action, {
+      method: form.method,
+      body: new FormData(form),
+      headers: {
+        accept: "application/json",
+      },
+    }).then((res) => res.json());
+  });
+};
+```
+
+#### On the server
+
+Same goes for the server: the idea is to move things in a dedicated `action` function to try getting as close as possible to what Remix does:
+
+```ts
+import type { AstroGlobal } from "astro";
+
+export type ActionReturnType<T> = Promise<{
+  response?: Response;
+  data?: T;
+}>;
+
+export type CallbackAction<T> = () => Promise<T>;
+
+export const action = async <T>(
+  Astro: AstroGlobal,
+  actionFn: CallbackAction<T>
+): ActionReturnType<T> => {
+  if (Astro.request.method === "POST") {
+    const isClientRequest =
+      Astro.request.headers.get("accept") === "application/json";
+
+    // We have moved the Astro.request.formData() computations
+    // outside this action function. This form checking
+    // should now be done in the callback
+    const data: T = await actionFn({ request: Astro.request });
+
+    if (isClientRequest) {
+      const response = new Response(JSON.stringify(data));
+
+      return { response, data };
+    }
+
+    return { data };
+  }
+
+  return { data: undefined };
+};
+```
+
+Here is how we would use it into the page module:
+
+```ts
+const { data, response } = await action(Astro, async () => {
+  const data = await Astro.request.formData();
+  const email = data.get("email")?.toString() || "";
+  const password = data.get("email")?.toString() || "";
+
+  if (!email.includes("@domain.com")) {
+    return { error: "Invalid email. It should contain @domain.com" };
+  }
+});
+
+if (response) return response;
+```
+
+One important thing to mention: the `action` function returns two objects: a `data` one and a `response` one.
+
+- When we submit the form using the regular HTTP way, we got back an entire document that is computed by astro with the variable available: in this case, it will use `data` to populate the template and since `data.error` might be filled, the template is generated accordingly.
+- When we submit the form using JavaScript on the client, we got back a JSON object. We don't want Astro to generate a whole HTML document and so we shortcut the Astro request with the `return response`.

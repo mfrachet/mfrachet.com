@@ -12,7 +12,7 @@ One great example of progressive enhancement is form handling in [Remix](https:/
 In Remix, you can create an almost regular HTML form, a function named `action` exported from the route module and there you go: the form is working **with and without JavaScript**.
 It means that people disabling JavaScript in their browser, or people under specific constraints regarding their devices (or browsers, or low-connectivity regions) can still use the form and benefit from the feature.
 
-Some people can stand that it's probably not necessary, and I agree. The thing is you have it for free. It's baked in and works using the same API no matter you submit your form from JavaScript or from the HTML form itself.
+Some people can stand that it's probably not necessary, and I agree. The thing is you have it for free. It's baked in and works using the same API no matter you submit the form from JavaScript or from the HTML form itself.
 
 ```tsx
 // Copy/pasted from the Remix doc about action https://remix.run/docs/en/main/route/action
@@ -34,11 +34,15 @@ export default function AddTodo() {
 }
 ```
 
-It's a minimal API that provides a great experience to the users to me.
+It's a minimal API that provides a great experience to the users.
 
 ## Remix is great, but what about [Astro](https://astro.build/)?
 
-As you may already know, Astro is a framework for server side rendering that provides the ability to integrate frontend frameworks to get interactivity in the client. It is not the same kind of (meta) framework as Remix or Nextjs.
-And as pointed on their own website, the framework focuses on content website _for now_.
+As you may already know, Astro is a framework for server side rendering that provides the ability to integrate frontend frameworks to get interactivity in the client. It is not the same kind of (meta) framework than [Remix](https://remix.run/) or [Nextjs](https://nextjs.org/).
+And as pointed on [their homepage](https://astro.build/), the framework focuses on content websites _for now_.
 
-Basically it means: use regular HTML forms or the things you have available on your client side framework (e.g: [formik](https://formik.org/) on React, or whatever alternative).
+Basically, regarding froms, it means: use regular HTML forms or the things you have available on your client side framework (e.g: [formik](https://formik.org/) on React, or whatever alternative), or build something yourself.
+
+We are going to try building something as close to what Remix provides as possible knowing that we have the following constraint: we only build user-lands, we can't tweak the inner framework implementation.
+
+It's important to have that in mind. We'll be forced to add a bit of verbosity along the way.

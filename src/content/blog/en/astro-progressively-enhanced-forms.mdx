@@ -15,7 +15,8 @@ It means that people disabling JavaScript in their browser, or people under spec
 Some people can stand that it's probably not necessary, and I agree. The thing is you have it for free. It's baked in and works using the same API no matter you submit the form from JavaScript or from the HTML form itself.
 
 ```tsx
-// Copy/pasted from the Remix doc about action https://remix.run/docs/en/main/route/action
+// Copy/pasted from the Remix doc
+// about action https://remix.run/docs/en/main/route/action
 export async function action({ request }: ActionFunctionArgs) {
   const body = await request.formData();
   const title = body.get("title");
@@ -53,4 +54,61 @@ I assume you already have an Astro project running locally. If that's not the ca
 
 ### Create an HTML form
 
-Let's start easy, and rely on progressive enhancement to
+The first step is to create a regular HTML form that we will enhance later:
+
+```astro
+---
+// index.astro
+---
+<main>
+  <h1>Welcome</h1>
+  <form method="post">
+    <label>
+      Email
+      <input type="email" name="email" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" />
+    </label>
+
+    <button>Sign in</button>
+  </form>
+</main>
+```
+
+### Handle the form on the backend
+
+This will be the progressive enhancement "baseline": a form that works with regular HTML, validated and handled in the backend so that as many users as possible can use it.
+
+Additional note: this works without JavaScript on the client.
+
+```astro
+---
+// index.astro
+
+let error: string | undefined;
+
+if (Astro.request.method === "POST") {
+  // process form handling
+  const data = await Astro.request.formData();
+  const email = data.get("email")?.toString() || "";
+  const password = data.get("email")?.toString() || "";
+
+  // basic email verifications
+  if (!email.includes("@domain.com")) {
+    error = "Invalid email. It should contain @domain.com";
+  }
+}
+---
+<main>
+  <h1>Welcome</h1>
+  {error && <span>{error}</span>}
+  <!-- HTML markup for the form -->
+</main>
+```
+
+### Handling the form client side
+
+The form works great but the page is flashing: when we submit the form, we make an HTTP POST request and get back an HTTP response which is basically a new, whole, document. The browser refreshes and it creates an effect of flickering.

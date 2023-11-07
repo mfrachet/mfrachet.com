@@ -75,7 +75,10 @@ const formattedDate = formatter.format(entry.data.date);
       <Content />
     </div>
 
-    <GithubIssueLink title="Yo" body="Yoyo" />
+    <GithubIssueLink
+      title={`Suggestions for: ${entry.data.title}`}
+      body={`Link of the article: https://mfrachet.com/blog/${slug}`}
+    />
 
     <div class="flex flex-col md:flex-row gap-4 pt-2">
       {

@@ -284,7 +284,9 @@ const { data, response } = await action(Astro, async () => {
 if (response) return response;
 ```
 
-One important thing to mention: the `action` function returns two objects: a `data` one and a `response` one.
+The `action` function returns two objects: a `data` one and a `response` one.
 
 - When we submit the form using the regular HTTP way, we got back an entire document that is computed by astro with the variable available: in this case, it will use `data` to populate the template and since `data.error` might be filled, the template is generated accordingly.
 - When we submit the form using JavaScript on the client, we got back a JSON object. We don't want Astro to generate a whole HTML document and so we shortcut the Astro request with the `return response`.
+
+This is the limitation I was referring too when saying that we will now exactly do what remix does. Remix has control over the route themselves and wraps them under the hood which is something we can't do user-lands with Astro.

@@ -3,6 +3,8 @@ title: "Astro: progressively enhanced forms"
 date: 2023-11-07
 ---
 
+import { Iframe } from "../../../components/Iframe";
+
 From [MDN documentation](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement):
 
 > Progressive enhancement is a design philosophy that provides a baseline of essential content and functionality to as many users as possible, while delivering the best possible experience only to users of the most modern browsers that can run all the required code.
@@ -308,7 +310,7 @@ The HTML code would now look like:
 <main>
   <h1>Welcome</h1>
   <!--  Since we return `data` now, we need to update from `error` to `data?.error` -->
-  {data?.error && <span data-form-id="error">{data?.error}</span>}
+  <span data-form-id="error">{data?.error}</span>
   <form method="post">
     <label>
       Email
@@ -353,3 +355,9 @@ export const handleClientForm = (form?: HTMLFormElement | null) => {
   });
 };
 ```
+
+With this code, the UI will update after the fetch request is made. Of course, this
+implementation is one way to achieve this. You can probably use other APIs or approaches
+to achieve this.
+
+<Iframe src="https://stackblitz.com/edit/withastro-astro-lgq9es?embed=1&file=src%2Fpages%2Findex.astro" />

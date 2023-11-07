@@ -12,7 +12,7 @@ One great example of progressive enhancement is form handling in [Remix](https:/
 In Remix, you can create an almost regular HTML form, a function named `action` exported from the route module and there you go: the form is working **with and without JavaScript**.
 It means that people disabling JavaScript in their browser, or people under specific constraints regarding their devices (or browsers, or low-connectivity regions) can still use the form and benefit from the feature.
 
-Some people can stand that it's probably not necessary, and I agree. The thing is you have it for free. It's baked in and works using the same API no matter you submit the form from JavaScript or from the HTML form itself.
+Some people can stand that it's probably not necessary, and I agree. The thing is you have it for free. It's baked in Remix and works using the same API no matter you submit the form from JavaScript or from the HTML form itself.
 
 ```tsx
 // Copy/pasted from the Remix doc
@@ -289,4 +289,67 @@ The `action` function returns two objects: a `data` one and a `response` one.
 - When we submit the form using the regular HTTP way, we got back an entire document that is computed by astro with the variable available: in this case, it will use `data` to populate the template and since `data.error` might be filled, the template is generated accordingly.
 - When we submit the form using JavaScript on the client, we got back a JSON object. We don't want Astro to generate a whole HTML document and so we shortcut the Astro request with the `return response`.
 
-This is the limitation I was referring too when saying that we will now exactly do what remix does. Remix has control over the route themselves and wraps them under the hood which is something we can't do user-lands with Astro.
+### Make the client code update the UI
+
+Here comes the limitation of not being able to modify the internals of Astro directly.
+
+Remix wraps the whole page with a [React context](https://github.com/remix-run/react-router/blob/4475b56d2e18014acfb8ff5f6077ff27df98d7fe/packages/react-router/lib/hooks.tsx#L780). In React, context is known to work both client AND server side:
+
+- if we submit the form without JavaScript, the `action` function will be executed and its returned value will be passed to the React context. Then Remix will re-render the whole page and send it back as a document with the updated content.
+- if we submit the form with JavaScript, the `action` function is called internally using `fetch`. Remix has now access to the data and can pass it down via context. It only needs to re-render on the client the content is updated.
+
+In our situation, we can't do that. We can't go higher than the route itself and we don't have access to the same rendering mechanism as React (also, islands might get us in trouble).
+
+We now have multiple solution, they are less elegant than the Remix one (which is basically "magic"). I'm going with the one on top of my head which is adding `data-*` attribute and update every of them if they exist.
+
+The HTML code would now look like:
+
+```html
+<main>
+  <h1>Welcome</h1>
+  <!--  Since we return `data` now, we need to update from `error` to `data?.error` -->
+  {data?.error && <span data-form-id="error">{data?.error}</span>}
+  <form method="post">
+    <label>
+      Email
+      <input type="email" name="email" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" />
+    </label>
+
+    <button>Sign in</button>
+  </form>
+</main>
+```
+
+And we then need to adjust the `handleClientForm` function to update these node when we got an answer from the backend:
+
+```ts {1,4-5}
+export const handleClientForm = (form?: HTMLFormElement | null) => {
+  if (!form) return;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    fetch(form.action, {
+      method: form.method,
+      body: new FormData(form),
+      headers: {
+        accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const allSlots = document.querySelectorAll("[data-form-id]");
+        allSlots.forEach((slot) => {
+          const dataName = slot.getAttribute("data-form-id");
+          const datum = data[dataName!];
+          slot.textContent = datum;
+        });
+      });
+  });
+};
+```

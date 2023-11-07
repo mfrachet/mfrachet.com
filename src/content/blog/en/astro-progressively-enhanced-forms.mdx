@@ -1,0 +1,37 @@
+---
+title: "Astro: progressively enhanced forms"
+date: 2023-11-07
+---
+
+From [MDN documentation](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement):
+
+> Progressive enhancement is a design philosophy that provides a baseline of essential content and functionality to as many users as possible, while delivering the best possible experience only to users of the most modern browsers that can run all the required code.
+
+One great example of progressive enhancement is form handling in [Remix](https://remix.run/).
+
+In Remix, you can create an almost regular HTML form, a function named `action` exported from the route module and there you go: the form is working **with and without JavaScript**.
+It means that people disabling JavaScript in their browser, or people under specific constraints regarding their devices (or browsers, or low-connectivity regions) can still use the form and benefit from the feature.
+
+Some people can stand that it's probably not necessary, and I agree. The thing is you have it for free. It's baked in and works using the same API no matter you submit your form from JavaScript or from the HTML form itself.
+
+```tsx
+// Copy/pasted from the Remix doc about action https://remix.run/docs/en/main/route/action
+export async function action({ request }: ActionFunctionArgs) {
+  const body = await request.formData();
+  const title = body.get("title");
+  const todo = await fakeCreateTodo({ title });
+
+  return redirect(`/todos/${todo.id}`);
+}
+
+export default function AddTodo() {
+  return (
+    <Form method="post">
+      <input type="text" name="title" />
+      <button type="submit">Create Todo</button>
+    </Form>
+  );
+}
+```
+
+It's a minimal API that provides a great experience to the users to me. Now, let's go back to the actual blog post: how to create something almost similar with Astro?

@@ -152,3 +152,7 @@ In this post, we'll create a framework agnostic solution.
   }
 </script>
 ```
+
+At this point, if you try to submit the form, the page does not refresh anymore. If you check the `network` tab of your browsers devtools, you should see a POST request hitting your current route but resolving a `document`.
+
+Since we are already in the browser, we don't want to receive a complete document. It wouldn't make sense since we would be in the same situation as before. What we want is JSON data that we can use to update the UI.

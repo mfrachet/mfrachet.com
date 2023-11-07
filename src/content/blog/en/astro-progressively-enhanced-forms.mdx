@@ -112,3 +112,43 @@ if (Astro.request.method === "POST") {
 ### Handling the form client side
 
 The form works great but the page is flashing: when we submit the form, we make an HTTP POST request and get back an HTTP response which is basically a new, whole, document. The browser refreshes and it creates an effect of flickering.
+
+We can mitigate this default behaviour by adding JavaScript on the client and instead of making a regular HTTP request, we can make a `fetch` one instead without refreshing the page.
+
+### Enhancing the form client side
+
+In this post, we'll create a framework agnostic solution.
+
+```astro
+---
+// index.astro
+// The POST handling server side
+---
+<main>
+  <h1>Welcome</h1>
+  {error && <span>{error}</span>}
+  <!-- HTML markup for the form -->
+</main>
+
+<script>
+  // Get the form reference
+  const form = document.querySelector("form");
+
+  if (form) {
+    // listen to the submit event of the form
+    form.addEventListener("submit", function (e) {
+      // Avoid to page flickering and deal with the form client side
+      e.preventDefault();
+
+      // fetch the current route instead of using the HTML form submission
+      fetch(form.action, {
+        method: form.method,
+        body: new FormData(form),
+        headers: {
+          accept: "application/json",
+        },
+      }).then((res) => res.json());
+    });
+  }
+</script>
+```

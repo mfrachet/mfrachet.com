@@ -1,0 +1,371 @@
+---
+title: "Astro: progressively enhanced forms"
+date: 2023-11-07
+---
+
+import { Iframe } from "../../../components/Iframe";
+
+From [MDN documentation](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement):
+
+> Progressive enhancement is a design philosophy that provides a baseline of essential content and functionality to as many users as possible, while delivering the best possible experience only to users of the most modern browsers that can run all the required code.
+
+One great example of progressive enhancement is form handling in [Remix](https://remix.run/).
+
+In Remix, you can create an almost regular HTML form, a function called `action`, and there you go: the form works **with and without JavaScript**.
+It means that people disabling JavaScript in their browsers, or under specific constraints regarding their devices (or browsers, or low-connectivity regions) can still use the form and benefit from the feature.
+
+Some people can stand that it's probably not necessary, and I agree. The thing is: it's free. It's baked in Remix and works using the same API.
+
+```tsx
+// Copy/pasted from the Remix doc
+// about action https://remix.run/docs/en/main/route/action
+export async function action({ request }: ActionFunctionArgs) {
+  const body = await request.formData();
+  const title = body.get("title");
+  const todo = await fakeCreateTodo({ title });
+
+  return redirect(`/todos/${todo.id}`);
+}
+
+export default function AddTodo() {
+  return (
+    <Form method="post">
+      <input type="text" name="title" />
+      <button type="submit">Create Todo</button>
+    </Form>
+  );
+}
+```
+
+It's a minimal API that provides a great experience to the users.
+
+## Remix is great, but what about [Astro](https://astro.build/)?
+
+As you may already know, Astro is a framework for server side rendering that provides the ability to integrate frontend frameworks to get interactivity in the client. It is not the same kind of (meta) framework than [Remix](https://remix.run/) or [Nextjs](https://nextjs.org/).
+And as pointed on [their homepage](https://astro.build/), the framework focuses on content websites _for now_.
+
+Basically, regarding froms, it means: use regular HTML forms or the things you have available on your client side framework (e.g: [formik](https://formik.org/) on React, or whatever alternative) or build something yourself.
+
+We are going to try building something as close to what Remix provides as possible knowing that we have the following constraint: we only build user-lands. We can't tweak the inner framework implementations to accomodate our needs.
+
+It's important to have that in mind. We'll be forced to add a bit of verbosity along the way.
+
+## Let's get into it
+
+I assume you already have an Astro project running locally. If that's not the case, you can create one from [the get started page](https://docs.astro.build/en/getting-started/).
+
+### Create an HTML form
+
+The first step is to create a regular HTML form that we will enhance later:
+
+```astro
+---
+// index.astro
+---
+<main>
+  <h1>Welcome</h1>
+  <form method="post">
+    <label>
+      Email
+      <input type="email" name="email" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" />
+    </label>
+
+    <button>Sign in</button>
+  </form>
+</main>
+```
+
+### Handle the form on the backend
+
+This will be the progressive enhancement "baseline": a form that works with regular HTML, validated and handled in the backend so that as many users as possible can use it.
+
+Additional note: this works without JavaScript on the client.
+
+```astro
+---
+// index.astro
+
+let error: string | undefined;
+
+if (Astro.request.method === "POST") {
+  // process form handling
+  const data = await Astro.request.formData();
+  const email = data.get("email")?.toString() || "";
+  const password = data.get("email")?.toString() || "";
+
+  // basic email verifications
+  if (!email.includes("@domain.com")) {
+    error = "Invalid email. It should contain @domain.com";
+  }
+}
+---
+<main>
+  <h1>Welcome</h1>
+  {error && <span>{error}</span>}
+  <!-- HTML markup for the form -->
+</main>
+```
+
+### Enhancing the form client side
+
+The form works great but the page is flashing: when we submit the form, we make an HTTP POST request and get back an HTTP response which is basically a new, whole, document. The browser refreshes to display that new document and it creates an effect of flickering.
+This is the default behaviour when using HTML `form` and used to work that way for decades now.
+
+There is one thing that we can do: when JavaScript is activated and loaded on the page, instead of making a regular HTML form request, we can use the `fetch` function to submit the form. That way, we avoid the page refresh and create a feeling of interactivity.
+
+```astro
+---
+// index.astro
+// The POST handling server side
+---
+<main>
+  <h1>Welcome</h1>
+  {error && <span>{error}</span>}
+  <!-- HTML markup for the form -->
+</main>
+
+<script>
+  // Get the form reference
+  const form = document.querySelector("form");
+
+  if (form) {
+    // listen to the submit event of the form
+    form.addEventListener("submit", function (e) {
+      // Avoid to page flickering and deal with the form client side
+      e.preventDefault();
+
+      // fetch the current route instead of using the HTML form submission
+      fetch(form.action, {
+        method: form.method,
+        body: new FormData(form),
+        headers: {
+          accept: "application/json",
+        },
+      }).then((res) => res.json());
+    });
+  }
+</script>
+```
+
+At this point, if you try to submit the form, the page does not refresh anymore. If you check the `network` tab of your browsers devtools, you should see a POST request hitting your current route but it resolves a whole a `document`.
+
+The reason is that our Astro backend only knows how to deal with regular HTML form. It doesn't know yet how to return either a whole document when the request comes from a regular HTML form or a simple JSON object when it receives a `fetch` request.
+
+Let's modify the backend code so that it can deal with both types of requests:
+
+```astro
+---
+let error: string | undefined;
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  const email = data.get("email")?.toString() || "";
+  const password = data.get("email")?.toString() || "";
+
+  if (!email.includes("@domain.com")) {
+    error = "Invalid email. It should contain @domain.com";
+  }
+
+  // Verify if the request comes from the client or the server
+  const isClientRequest =
+    Astro.request.headers.get("accept") === "application/json";
+
+  // If it comes from the client, return a JSON response with the data
+  if (isClientRequest) {
+    const response = new Response(JSON.stringify({ error }));
+
+    return response;
+  }
+}
+---
+```
+
+If you now try to submit the form again with JavaScript enabled, with your devtools opened, you can see that the fetch request now returns a JSON object with the error. It means that we can deal with this object to update the UI.
+
+### Cleaning up the ground and abstracting
+
+It's already a bunch of code. Let's try to abstract the code from both the client and the server so that we can use it in different places easily.
+
+#### On the client
+
+We only want the most necessary code to enhance the form submission with as less code as possible. We can, as one example, end up with something like the following:
+
+```astro
+<script>
+  import { handleClientForm } from "./handleClientForm";
+
+  handleClientForm(document.querySelector("form"));
+</script>
+
+```
+
+Let's move the content of the previous `<script>` tag into a dedicated `handleClientForm` function:
+
+```ts
+export const handleClientForm = (form?: HTMLFormElement | null) => {
+  if (!form) return;
+
+  // listen to the submit event of the form
+  form.addEventListener("submit", function (e) {
+    // Avoid to page flickering and deal with the form client side
+    e.preventDefault();
+
+    // fetch the current route instead of using the HTML form submission
+    fetch(form.action, {
+      method: form.method,
+      body: new FormData(form),
+      headers: {
+        accept: "application/json",
+      },
+    }).then((res) => res.json());
+  });
+};
+```
+
+#### On the server
+
+Same goes for the server: the idea is to move things in a dedicated `action` function to try getting as close as possible to what Remix does:
+
+```ts
+import type { AstroGlobal } from "astro";
+
+export type ActionReturnType<T> = Promise<{
+  response?: Response;
+  data?: T;
+}>;
+
+export type CallbackAction<T> = () => Promise<T>;
+
+export const action = async <T>(
+  Astro: AstroGlobal,
+  actionFn: CallbackAction<T>
+): ActionReturnType<T> => {
+  if (Astro.request.method === "POST") {
+    const isClientRequest =
+      Astro.request.headers.get("accept") === "application/json";
+
+    // We have moved the Astro.request.formData() computations
+    // outside this action function. This form checking
+    // should now be done in the callback
+    const data: T = await actionFn({ request: Astro.request });
+
+    if (isClientRequest) {
+      const response = new Response(JSON.stringify(data));
+
+      return { response, data };
+    }
+
+    return { data };
+  }
+
+  return { data: undefined };
+};
+```
+
+Here is how we would use it into the page module:
+
+```ts
+const { data, response } = await action(Astro, async () => {
+  const data = await Astro.request.formData();
+  const email = data.get("email")?.toString() || "";
+  const password = data.get("email")?.toString() || "";
+
+  if (!email.includes("@domain.com")) {
+    return { error: "Invalid email. It should contain @domain.com" };
+  }
+});
+
+if (response) return response;
+```
+
+The `action` function returns two objects: a `data` one and a `response` one.
+
+- When we submit the form using the regular HTTP way, we got back an entire document that is computed by astro with the available variables: in this case, it will use `data` to populate the template and since `data.error` might be filled, the template is generated accordingly.
+- When we submit the form using JavaScript on the client, we want to get back a JSON object. We don't want Astro to generate a whole HTML document. In this case, we wrap the JSON object into a `response` and early return it so that Astro does not try to generate a new HTML document.
+
+### Make the client code update the UI
+
+From the previous sections about client side code, we sent a `fetch` request, but the UI was not updated. The reason is because the variable used in the Astro page are only available when building the page server side. Since we have shortcut this mechanism with the JSON response, we need to update the DOM manually when JavaScript kicks in.
+
+This is the limitation I was referring too at the beginning of this article.
+
+Remix wraps the whole page with a [React context](https://github.com/remix-run/react-router/blob/4475b56d2e18014acfb8ff5f6077ff27df98d7fe/packages/react-router/lib/hooks.tsx#L780). In React, context is known to work both client AND server side:
+
+- if we submit the form without JavaScript, the `action` function will be executed and its returned value will be passed to the React context **on the server**. Then Remix will render the whole React tree (on the server again) and send it back as a document with the updated content.
+- if we submit the form with JavaScript, the `action` function is called as a `fetch` endpoint. Remix has now access to the data **on the client** and can pass it down via context. It re-renders the React tree (on the client again) and the content is updated.
+
+Beautiful trick.
+
+In our case, we can't do that: we don't have context in Astro. And even if we use React for our islands, the context provider should still be in our page, written by us. Plus, because of islands, the context might not work as you may think it would.
+
+With that in mind, we have different solutions and it's up to you to chose one depending on your context. They are less elegant than the Remix one.
+
+I will go with a framework agnostic one, without leveraging React or anything but instead I will rely on `data-*` attribute to update text nodes that need to be updated:
+
+```html
+<main>
+  <h1>Welcome</h1>
+  <!--  Let's add the data-form-id attribute so that our script can updated it -->
+  <span data-form-id="error">{data?.error}</span>
+  <form method="post">
+    <label>
+      Email
+      <input type="email" name="email" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" />
+    </label>
+
+    <button>Sign in</button>
+  </form>
+</main>
+```
+
+And then adjust the `handleClientForm` function to update these node when we got an answer from the backend:
+
+```ts {1,4-5}
+export const handleClientForm = (form?: HTMLFormElement | null) => {
+  if (!form) return;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    fetch(form.action, {
+      method: form.method,
+      body: new FormData(form),
+      headers: {
+        accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // Get all the dom node with a data-form-id attribute
+        const allSlots = document.querySelectorAll("[data-form-id]");
+        allSlots.forEach((slot) => {
+          // For each of them get their value, which is basically the key of the data we get from the server,
+          // in our case `error`
+          const dataName = slot.getAttribute("data-form-id");
+          const datum = data[dataName!];
+
+          // update the according DOM node with the value received from the fetch call
+          slot.textContent = datum;
+        });
+      });
+  });
+};
+```
+
+With this code, the UI will update after the fetch request is made.
+
+Of course, this blog post does not cover every single bit of form handling. It aims to be an experiment to achieve something that I find very beautiful in another framework.
+
+If you want to play with it in Stackblitz, give it a look:
+
+<Iframe src="https://stackblitz.com/edit/withastro-astro-lgq9es?embed=1&file=src%2Fpages%2Findex.astro" />

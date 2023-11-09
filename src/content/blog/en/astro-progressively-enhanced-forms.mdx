@@ -154,11 +154,9 @@ There is one thing that we can do: when JavaScript is activated and loaded on th
 
 At this point, if you try to submit the form, the page does not refresh anymore. If you check the `network` tab of your browsers devtools, you should see a POST request hitting your current route but it resolves a whole a `document`.
 
-The reason is that our backend only knows how to deal with regular HTML form. We need to improve it and make it able to deal with regular HTML form but also with JSON requests using `fetch`.
+The reason is that our Astro backend only knows how to deal with regular HTML form. It doesn't know yet how to return either a whole document when the request comes from a regular HTML form or a simple JSON object when it receives a `fetch` request.
 
-Since we are already in the browser, we don't want to receive a complete document. It wouldn't make sense since we would be in the same situation as before. What we want is JSON data that we can use to update the UI.
-
-To achieve that, we need to modify the form handling on the server to return JSON in one case and a whole document in another case:
+Let's modify the backend code so that it can deal with both types of requests:
 
 ```astro
 ---
@@ -195,7 +193,7 @@ It's already a bunch of code. Let's try to abstract the code from both the clien
 
 #### On the client
 
-On the browser, what we want is something as easy as:
+We only want the most necessary code to enhance the form submission with as less code as possible. We can, as one example, end up with something like the following:
 
 ```astro
 <script>
@@ -206,7 +204,7 @@ On the browser, what we want is something as easy as:
 
 ```
 
-We can achieve this by moving most of the `<script>` tag into a dedicated `handleClientForm` function:
+Let's move the content of the previous `<script>` tag into a dedicated `handleClientForm` function:
 
 ```ts
 export const handleClientForm = (form?: HTMLFormElement | null) => {
@@ -287,28 +285,32 @@ if (response) return response;
 
 The `action` function returns two objects: a `data` one and a `response` one.
 
-- When we submit the form using the regular HTTP way, we got back an entire document that is computed by astro with the variable available: in this case, it will use `data` to populate the template and since `data.error` might be filled, the template is generated accordingly.
-- When we submit the form using JavaScript on the client, we got back a JSON object. We don't want Astro to generate a whole HTML document and so we shortcut the Astro request with the `return response`.
+- When we submit the form using the regular HTTP way, we got back an entire document that is computed by astro with the available variables: in this case, it will use `data` to populate the template and since `data.error` might be filled, the template is generated accordingly.
+- When we submit the form using JavaScript on the client, we want to get back a JSON object. We don't want Astro to generate a whole HTML document. In this case, we wrap the JSON object into a `response` and early return it so that Astro does not try to generate a new HTML document.
 
 ### Make the client code update the UI
 
-Here comes the limitation of not being able to modify the internals of Astro directly.
+From the previous sections about client side code, we sent a `fetch` request, but the UI was not updated. The reason is because the variable used in the Astro page are only available when building the page server side. Since we have shortcut this mechanism with the JSON response, we need to update the DOM manually when JavaScript kicks in.
+
+This is the limitation I was referring too at the beginning of this article.
 
 Remix wraps the whole page with a [React context](https://github.com/remix-run/react-router/blob/4475b56d2e18014acfb8ff5f6077ff27df98d7fe/packages/react-router/lib/hooks.tsx#L780). In React, context is known to work both client AND server side:
 
-- if we submit the form without JavaScript, the `action` function will be executed and its returned value will be passed to the React context. Then Remix will re-render the whole page and send it back as a document with the updated content.
-- if we submit the form with JavaScript, the `action` function is called internally using `fetch`. Remix has now access to the data and can pass it down via context. It only needs to re-render on the client the content is updated.
+- if we submit the form without JavaScript, the `action` function will be executed and its returned value will be passed to the React context **on the server**. Then Remix will render the whole React tree (on the server again) and send it back as a document with the updated content.
+- if we submit the form with JavaScript, the `action` function is called as a `fetch` endpoint. Remix has now access to the data **on the client** and can pass it down via context. It re-renders the React tree (on the client again) and the content is updated.
 
-In our situation, we can't do that. We can't go higher than the route itself and we don't have access to the same rendering mechanism as React (also, islands might get us in trouble).
+Beautiful trick.
 
-We now have multiple solution, they are less elegant than the Remix one (which is basically "magic"). I'm going with the one on top of my head which is adding `data-*` attribute and update every of them if they exist.
+In our case, we can't do that: we don't have context in Astro. And even if we use React for our islands, the context provider should still be in our page, written by us. Plus, because of islands, the context might not work as you may think it would.
 
-The HTML code would now look like:
+With that in mind, we have different solutions and it's up to you to chose one depending on your context. They are less elegant than the Remix one.
+
+I will go with a framework agnostic one, without leveraging React or anything but instead I will rely on `data-*` attribute to update text nodes that need to be updated:
 
 ```html
 <main>
   <h1>Welcome</h1>
-  <!--  Since we return `data` now, we need to update from `error` to `data?.error` -->
+  <!--  Let's add the data-form-id attribute so that our script can updated it -->
   <span data-form-id="error">{data?.error}</span>
   <form method="post">
     <label>
@@ -326,7 +328,7 @@ The HTML code would now look like:
 </main>
 ```
 
-And we then need to adjust the `handleClientForm` function to update these node when we got an answer from the backend:
+And then adjust the `handleClientForm` function to update these node when we got an answer from the backend:
 
 ```ts {1,4-5}
 export const handleClientForm = (form?: HTMLFormElement | null) => {
@@ -344,10 +346,15 @@ export const handleClientForm = (form?: HTMLFormElement | null) => {
     })
       .then((res) => res.json())
       .then((data) => {
+        // Get all the dom node with a data-form-id attribute
         const allSlots = document.querySelectorAll("[data-form-id]");
         allSlots.forEach((slot) => {
+          // For each of them get their value, which is basically the key of the data we get from the server,
+          // in our case `error`
           const dataName = slot.getAttribute("data-form-id");
           const datum = data[dataName!];
+
+          // update the according DOM node with the value received from the fetch call
           slot.textContent = datum;
         });
       });
@@ -355,8 +362,10 @@ export const handleClientForm = (form?: HTMLFormElement | null) => {
 };
 ```
 
-With this code, the UI will update after the fetch request is made. Of course, this
-implementation is one way to achieve this. You can probably use other APIs or approaches
-to achieve this.
+With this code, the UI will update after the fetch request is made.
 
-{/* <Iframe src="https://stackblitz.com/edit/withastro-astro-lgq9es?embed=1&file=src%2Fpages%2Findex.astro" /> */}
+Of course, this blog post does not cover every single bit of form handling. It aims to be an experiment to achieve something that I find very beautiful in another framework.
+
+If you want to play with it in Stackblitz, give it a look:
+
+<Iframe src="https://stackblitz.com/edit/withastro-astro-lgq9es?embed=1&file=src%2Fpages%2Findex.astro" />

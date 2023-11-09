@@ -11,10 +11,10 @@ From [MDN documentation](https://developer.mozilla.org/en-US/docs/Glossary/Progr
 
 One great example of progressive enhancement is form handling in [Remix](https://remix.run/).
 
-In Remix, you can create an almost regular HTML form, a function named `action` exported from the route module and there you go: the form is working **with and without JavaScript**.
-It means that people disabling JavaScript in their browser, or people under specific constraints regarding their devices (or browsers, or low-connectivity regions) can still use the form and benefit from the feature.
+In Remix, you can create an almost regular HTML form, a function called `action`, and there you go: the form works **with and without JavaScript**.
+It means that people disabling JavaScript in their browsers, or under specific constraints regarding their devices (or browsers, or low-connectivity regions) can still use the form and benefit from the feature.
 
-Some people can stand that it's probably not necessary, and I agree. The thing is you have it for free. It's baked in Remix and works using the same API no matter you submit the form from JavaScript or from the HTML form itself.
+Some people can stand that it's probably not necessary, and I agree. The thing is: it's free. It's baked in Remix and works using the same API.
 
 ```tsx
 // Copy/pasted from the Remix doc
@@ -44,9 +44,9 @@ It's a minimal API that provides a great experience to the users.
 As you may already know, Astro is a framework for server side rendering that provides the ability to integrate frontend frameworks to get interactivity in the client. It is not the same kind of (meta) framework than [Remix](https://remix.run/) or [Nextjs](https://nextjs.org/).
 And as pointed on [their homepage](https://astro.build/), the framework focuses on content websites _for now_.
 
-Basically, regarding froms, it means: use regular HTML forms or the things you have available on your client side framework (e.g: [formik](https://formik.org/) on React, or whatever alternative), or build something yourself.
+Basically, regarding froms, it means: use regular HTML forms or the things you have available on your client side framework (e.g: [formik](https://formik.org/) on React, or whatever alternative) or build something yourself.
 
-We are going to try building something as close to what Remix provides as possible knowing that we have the following constraint: we only build user-lands, we can't tweak the inner framework implementation.
+We are going to try building something as close to what Remix provides as possible knowing that we have the following constraint: we only build user-lands. We can't tweak the inner framework implementations to accomodate our needs.
 
 It's important to have that in mind. We'll be forced to add a bit of verbosity along the way.
 
@@ -111,15 +111,12 @@ if (Astro.request.method === "POST") {
 </main>
 ```
 
-### Handling the form client side
-
-The form works great but the page is flashing: when we submit the form, we make an HTTP POST request and get back an HTTP response which is basically a new, whole, document. The browser refreshes and it creates an effect of flickering.
-
-We can mitigate this default behaviour by adding JavaScript on the client and instead of making a regular HTTP request, we can make a `fetch` one instead without refreshing the page.
-
 ### Enhancing the form client side
 
-In this post, we'll create a framework agnostic solution.
+The form works great but the page is flashing: when we submit the form, we make an HTTP POST request and get back an HTTP response which is basically a new, whole, document. The browser refreshes to display that new document and it creates an effect of flickering.
+This is the default behaviour when using HTML `form` and used to work that way for decades now.
+
+There is one thing that we can do: when JavaScript is activated and loaded on the page, instead of making a regular HTML form request, we can use the `fetch` function to submit the form. That way, we avoid the page refresh and create a feeling of interactivity.
 
 ```astro
 ---
@@ -155,7 +152,9 @@ In this post, we'll create a framework agnostic solution.
 </script>
 ```
 
-At this point, if you try to submit the form, the page does not refresh anymore. If you check the `network` tab of your browsers devtools, you should see a POST request hitting your current route but resolving a `document`.
+At this point, if you try to submit the form, the page does not refresh anymore. If you check the `network` tab of your browsers devtools, you should see a POST request hitting your current route but it resolves a whole a `document`.
+
+The reason is that our backend only knows how to deal with regular HTML form. We need to improve it and make it able to deal with regular HTML form but also with JSON requests using `fetch`.
 
 Since we are already in the browser, we don't want to receive a complete document. It wouldn't make sense since we would be in the same situation as before. What we want is JSON data that we can use to update the UI.
 
@@ -360,4 +359,4 @@ With this code, the UI will update after the fetch request is made. Of course, t
 implementation is one way to achieve this. You can probably use other APIs or approaches
 to achieve this.
 
-<Iframe src="https://stackblitz.com/edit/withastro-astro-lgq9es?embed=1&file=src%2Fpages%2Findex.astro" />
+{/* <Iframe src="https://stackblitz.com/edit/withastro-astro-lgq9es?embed=1&file=src%2Fpages%2Findex.astro" /> */}

@@ -54,7 +54,7 @@ const description =
       >
         🎃
       </span>
-       Hey there, want to get in touch?{" "}
+      Hey there, want to get in touch?{" "}
       <Link href="mailto:marvin@frachet.eu" target="_blank" variant="light">
         marvin@frachet.eu
       </Link>
@@ -75,14 +75,9 @@ const description =
   }
 </style>
 
-<script>
-  const clientKey = import.meta.env.PUBLIC_PROGRESSIVELY_CLIENT;
-
-  import { Progressively } from "@progressively/sdk-js";
-
-  const sdk = Progressively.init(clientKey, {
-    apiUrl: "https://progressively-backend.onrender.com",
-  });
-
-  sdk.track();
-</script>
+<script
+  is:inline
+  src="https://www.progressively.app/progressively.min.js"
+  data-progressively-endpoint="https://api.progressively.app"
+  data-progressively-client-key={import.meta.env.PUBLIC_PROGRESSIVELY_CLIENT}
+></script>

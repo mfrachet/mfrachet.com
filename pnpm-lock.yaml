@@ -17,9 +17,6 @@ dependencies:
   '@astrojs/vercel':
     specifier: ^5.1.0
     version: 5.1.0(astro@3.4.2)
-  '@progressively/sdk-js':
-    specifier: ^1.0.2
-    version: 1.0.2
   '@tailwindcss/typography':
     specifier: ^0.5.10
     version: 0.5.10(tailwindcss@3.3.5)
@@ -1119,16 +1116,6 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
-
-  /@progressively/sdk-js@1.0.2:
-    resolution: {integrity: sha512-dVINYjGQzpOvb9ZJI0xncQGx3vHFliBMGIDcs+OLsSdzvQOBni2OgFoIPf94WThMCbhdAmHRq4IXo8Prvs+XNA==}
-    dependencies:
-      '@progressively/types': 1.0.0
-    dev: false
-
-  /@progressively/types@1.0.0:
-    resolution: {integrity: sha512-KJ7NgSyg1hSUXNSC1GORqOC74G/iTfTuZPNmTuqBjhiqjeaAWKPGvbypH75Xo8WMsNZJjoiPU2ZqWmrpyCXyRA==}
-    dev: false
 
   /@rollup/pluginutils@4.2.1:
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}

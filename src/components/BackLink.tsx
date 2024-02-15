@@ -1,4 +1,4 @@
-import { BsChevronLeft } from "react-icons/bs/index";
+import { BsChevronLeft } from "react-icons/bs";
 
 export interface BackLinkProps {
   children: React.ReactNode;

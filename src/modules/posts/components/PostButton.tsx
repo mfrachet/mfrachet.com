@@ -1,4 +1,4 @@
-import { BsArrowLeftShort, BsArrowRightShort } from "react-icons/bs/index";
+import { BsArrowLeftShort, BsArrowRightShort } from "react-icons/bs";
 
 export interface PostButtonProps {
   children: React.ReactNode;

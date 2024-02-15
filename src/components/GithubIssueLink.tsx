@@ -1,4 +1,4 @@
-import { MdOutlineModeEditOutline } from "react-icons/md/index";
+import { MdOutlineModeEditOutline } from "react-icons/md";
 
 export interface GithubIssueLinkProps {
   title: string;

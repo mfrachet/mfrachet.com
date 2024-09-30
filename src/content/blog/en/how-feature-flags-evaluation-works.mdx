@@ -18,6 +18,8 @@ To fully understand how it works depending on a few cases, let's agree on the fo
 - **"The user land code"**: the code that is requesting the feature flag evaluation. It's in the final client application (if you are building a feature flag service, it's not in your hands)
 - **"The evaluation process"**: how are the feature flags computed for the given configuration and the user.
 
+Another note: the code for the feature flag evaluation can be done on the client side (in an SDK for example) or the server side (directly on your service API) depending on the tradeoffs you're ok with.
+
 Let's distill the process.
 
 ## One for all system
@@ -185,7 +187,7 @@ To make it work, we need to get a unique ID from the user and we have multiple o
 
 Each of these options has its pros and cons. Choose the one that makes the most sense for your use case.
 
-We now have a unique identifier (that is very probably a string) across sessions that we can use to make computations. But how can we compare a `string` value to a percentage range?
+We now have a unique identifier (that is very probably a string) that is consistent across sessions that we can use to make computations. But how can we compare a `string` value to a percentage range?
 
 The answer, which is where the magic happens, is to use a hashing algorithm that is able to convert a string into a number. This hashing algorithm has to run with the avalanch effect: a small modification in the string itself (even just one character) produces a completely different hash.
 

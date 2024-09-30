@@ -319,3 +319,39 @@ const user: User = {
 
 const isNewHomepageEnabled = evaluate("new-homepage", user); // true / false
 ```
+
+## Evaluating multiple variants
+
+The process of evaluating multiple variants is similar to the percentage based rollout. The only difference is that instead of having only one percentage value, we have multiples ones to check against.
+
+One important thing is that the variants percentage should be sorted so that we can put the user in the right range. For instance, if your configuration looks the following way:
+
+```tsx
+const flagConfigurations = [
+  {
+    key: "new-homepage",
+    name: "New homepage",
+    status: "active",
+    variants: [
+      {
+        key: "B",
+        name: "Variant B",
+        expectedPercentage: 20,
+      },
+      {
+        key: "A",
+        name: "Variant A",
+        expectedPercentage: 10,
+      },
+    ],
+  },
+];
+```
+
+if you compare the user/flag key in a sequential way and the array is not sorted, the user will be put in the "20%" range instead of the "10%" range.
+
+Otherwise, the process is the same :).
+
+---
+
+This blog post is not an easy one to read but I hope that you've learnt something interesting like I did!

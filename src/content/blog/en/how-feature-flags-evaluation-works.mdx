@@ -1,0 +1,319 @@
+---
+title: How feature flags evaluation works?
+date: 2024-09-29
+---
+
+_This article doesn't aim to explain what are feature flags or when they should be used, but more on explaining the underlying computation happening when a user requests one._
+
+I've been working with feature flags for around a decade now. And in the past few years, I've been working on building my own solution: [Progressively](https://github.com/progressively-crew/progressively). At the beginning, I was building the tool exactly to understand
+how feature flags evaluation worked. I was wondering how it was possible to have a system that is able to consistently provide the same value depending on the user, the feature flag and some configuration.
+
+> At some point, I thought I could build a company on top of it. Long story short, I tried to launch the product and I failed to find my early users. At least, I've learned some good things!
+
+Isn't that magical that when a user is requesting a feature flag evaluation, they always get the same result? How is that possible that 10% of the audience will evaluate one variant and 90% will evaluate another one **consistently**?
+
+To fully understand how it works depending on a few cases, let's agree on the following terminology used in the next examples:
+
+- **"The configuration"**: the JSON format storing the feature flags configuration, in a database for example
+- **"The user land code"**: the code that is requesting the feature flag evaluation. It's in the final client application (if you are building a feature flag service, it's not in your hands)
+- **"The evaluation process"**: how are the feature flags computed for the given configuration and the user.
+
+Let's distill the process.
+
+## One for all system
+
+### The configuration
+
+It's the simplest case. You have a list of feature flags with a very small configuration and their status ("active" or "inactive"). It's basically saying that if the feature flag is active, then everybody will see the feature, otherwise no one will.
+
+```tsx
+const flagConfigurations = [
+  {
+    key: "new-homepage",
+    name: "New homepage",
+    status: "active",
+  },
+  {
+    key: "blackfriday-banner",
+    name: "Black Friday banner",
+    status: "inactive",
+  },
+];
+```
+
+### The user land code
+
+```tsx
+const App = () => {
+  const { flags } = useFlags();
+
+  if (flags.newHomepage) {
+    return <NewHomepage />;
+  }
+
+  return <OldHomepage />;
+};
+```
+
+On this snippet, when the `flags.newHomepage` will be evaluated, then the application will render the `NewHomepage` component, otherwise it will render the `OldHomepage` component.
+
+### The evaluation process
+
+The evaluation process is really simple. It's just a matter of checking the configuration and returning the status of the feature flag. There is no notion of the current user here since the evaluation concerns the whole user base.
+
+```tsx
+const evaluate = (flagName: string) => {
+  // Find the configuration for the given flag name where it is (DB for example, but in our case it's just an in-memory array)
+  const flag = flagConfigurations.find((flag) => flag.key === flagName);
+
+  // Return the status of the feature flag
+  return flag?.status === "active";
+};
+
+const isNewHomepageEnabled = evaluate("new-homepage"); // true / false
+```
+
+## Using user properties
+
+### The configuration
+
+The configuration is now a bit different. The user needs to have a property `email` containing the domain `frachet.com` to be eligible for the feature flag evaluation. If the user is not eligible, then the feature flag will be inactive for this user.
+
+```tsx
+const flagConfigurations = [
+  {
+    key: "new-homepage",
+    name: "New homepage",
+    status: "active",
+    conditions: [
+      {
+        field: "email",
+        operator: "contains",
+        value: "frachet.com",
+      },
+    ],
+  },
+];
+```
+
+### The user land code
+
+```tsx
+// The user has to explicitly set its properties and send them to the feature flag service,
+// otherwise the system is not able to get the needed data to process the evaluation
+//
+// NB: this is a pseudo code, configuration can be added in a provider higher in the tree.
+// This example is simple enough with not too much code to be easy to understand.
+setConfiguration({
+  user: {
+    email: "john.doe@frachet.com",
+  },
+});
+
+const App = () => {
+  const { flags } = useFlags();
+
+  if (flags.newHomepage) {
+    return <NewHomepage />;
+  }
+
+  return <OldHomepage />;
+};
+```
+
+### The evaluation process
+
+The evaluation process is changing a bit. Now, we need to know a bit more about the user and check for their eligibility before being able to evaluate the feature flag.
+
+```tsx
+// Verify eligibily for the evaluation
+const isUserEligible = (user: User, conditions: Conditions) => {
+  // If there is no conditions, the user is eligible
+  if (conditions.length === 0) return true;
+
+  return conditions.every((condition) => {
+    switch (condition.operator) {
+      case "contains":
+        return user[condition.field].includes(condition.value);
+      default:
+        return false;
+    }
+  });
+};
+```
+
+```tsx
+// Evaluate a variant for the given feature flag and user
+const evaluate = (flagName: string, user: User) => {
+  // Find the configuration for the given flag name where it is (DB for example, but in our case it's just an in-memory array)
+  const flag = flagConfigurations.find((flag) => flag.key === flagName);
+
+  // If the flag is not found, early break and return false by default
+  if (!flag || flag.status === "inactive") return false;
+
+  return isUserEligible(user, flag.conditions);
+};
+```
+
+```tsx
+// Get the homepage value for the given user
+const user: User = {
+  email: "john@frachet.com",
+};
+
+const isNewHomepageEnabled = evaluate("new-homepage", user); // true / false
+```
+
+## Percentage based rollout
+
+The percentage based rollout is a bit more complex than the previous one. The idea is that we want to rollout the feature flag to a percentage of the users. For example, we want to rollout the feature flag to 10% of them.
+
+How to consistently pick up the 10% of users among the whole user base?
+
+The secret is that we will not target exactly and strictly 10% of the users. What I mean here is that if you have 100 users, it is not guaranteed that 10 users will evaluate the "new" variant of the feature flag. It might be 8 or 9 or 10 if we are lucky.
+
+The thing is that we will target 10% in statistical manner. Meaning that for **a very large number of users**, 10% of them will be targeted. The more users there are, the closer to 10% we will get.
+
+Remember, it's only about statistics.
+
+To make it work, we need to get a unique ID from the user and we have multiple options for that:
+
+- asking the user to explicitly set it in the user land configuration (`setConfiguration({ id: "your-id " })` in our example)
+- generating a random one using the client side SDK (the client SDK is `useFlags` in our example) and store this ID locally with the browser mechanism (local storage for example)
+- generating a random one using the HTTP protocol and using HTTP Cookies to identify the user (on the server side)
+- relying on the user agent (browser) on the server side. Convenient if you don't like cookies (this is how [Plausiblehq](https://plausible.io/) is doing private analytics btw)
+
+Each of these options has its pros and cons. Choose the one that makes the most sense for your use case.
+
+We now have a unique identifier (that is very probably a string) across sessions that we can use to make computations. But how can we compare a `string` value to a percentage range?
+
+The answer, which is where the magic happens, is to use a hashing algorithm that is able to convert a string into a number. This hashing algorithm has to run with the avalanch effect: a small modification in the string itself (even just one character) produces a completely different hash.
+
+Lucky we are, this algorithm already exists and is called [MurmurHash](https://en.wikipedia.org/wiki/MurmurHash).
+
+Let's give a real world example:
+
+```tsx
+const expectedPercentage = 10; // From the configuration, we want to target 10% of the users
+const flagKey = "new-homepage"; // From the configuration
+const userId = "0201d641-deb0-4e48-beba-edccf23a17ba"; // Generated using of the above methods
+
+const MAX_INT_32 = Math.pow(2, 32); // Determining the maximum value of a 32 bit integer in JavaScript so that we can convert to percentages
+const evaluationKey = `${flagKey}-${userId}`; // creating a unique evaluation key for the given flag and user. It allows to be in different evaluation buckets on different flags.
+const hash = murmurhash3(evaluationKey); // computing the hash of the evaluation key
+const userFlagPercentage = (hash / MAX_INT_32) * 100; // converting the hash to a percentage
+
+if (userFlagPercentage <= expectedPercentage) {
+  return true; // The user is in the 10% of the users targeted by this configuration
+}
+
+return false; // The user is not in the 10% of the users targeted by this configuration
+```
+
+### The configuration
+
+We've adjusted the configuration to add the `expectedPercentage` field to target the 10% of the users.
+
+```tsx
+const flagConfigurations = [
+  {
+    key: "new-homepage",
+    name: "New homepage",
+    status: "active",
+    expectedPercentage: 10,
+    conditions: [
+      {
+        field: "email",
+        operator: "contains",
+        value: "frachet.com",
+      },
+    ],
+  },
+];
+```
+
+### The user land code
+
+```tsx
+setConfiguration({
+  user: {
+    id: "0201d641-deb0-4e48-beba-edccf23a17ba", // we explicitly set it for simplicity
+    email: "john.doe@frachet.com",
+  },
+});
+
+const App = () => {
+  const { flags } = useFlags();
+
+  if (flags.newHomepage) {
+    return <NewHomepage />;
+  }
+
+  return <OldHomepage />;
+};
+```
+
+### The evaluation process
+
+```tsx
+// Verify eligibily for the evaluation
+const isUserEligible = (user: User, conditions: Conditions) => {
+  // If there is no conditions, the user is eligible
+  if (conditions.length === 0) return true;
+
+  return conditions.every((condition) => {
+    switch (condition.operator) {
+      case "contains":
+        return user[condition.field].includes(condition.value);
+      default:
+        return false;
+    }
+  });
+};
+```
+
+```tsx
+const evaluateFlagPercentage = (expectedPercentage: number, userId: string) => {
+  if (expectedPercentage === 0) return false;
+  if (expectedPercentage === 100) return true;
+
+  const MAX_INT_32 = Math.pow(2, 32); // Determining the maximum value of a 32 bit integer in JavaScript so that we can convert to percentages
+  const evaluationKey = `${flagKey}-${userId}`; // creating a unique evaluation key for the given flag and user. It allows to be in different evaluation buckets on different flags.
+  const hash = murmurhash3(evaluationKey); // computing the hash of the evaluation key
+  const userFlagPercentage = (hash / MAX_INT_32) * 100; // converting the hash to a percentage
+
+  return userFlagPercentage <= expectedPercentage;
+};
+```
+
+```tsx
+// Evaluate a variant for the given feature flag and user
+const evaluate = (flagName: string, user: User) => {
+  // Find the configuration for the given flag name where it is (DB for example, but in our case it's just an in-memory array)
+  const flag = flagConfigurations.find((flag) => flag.key === flagName);
+
+  // If the flag is not found, early break and return false by default
+  if (!flag || flag.status === "inactive") return false;
+
+  // We always check for eligibility first because when coupling conditions and percentages,
+  // we want to say: "show the flag to 10% of the users that fit the conditions"
+  // so we first need to check if the user is eligible for the conditions.
+  //
+  // Otherwise, it would mean: "Take 10% of the whole audience, and check the conditions after which could lead to more users being targeted"
+  if (!isUserEligible(user, flag.conditions)) {
+    return false;
+  }
+
+  return evaluateFlagPercentage(flag.expectedPercentage, user.id);
+};
+```
+
+```tsx
+// Get the homepage value for the given user
+const user: User = {
+  id: "0201d641-deb0-4e48-beba-edccf23a17ba",
+  email: "john@frachet.com",
+};
+
+const isNewHomepageEnabled = evaluate("new-homepage", user); // true / false
+```

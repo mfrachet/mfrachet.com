@@ -10,7 +10,7 @@ interface NavLinkProps extends HTMLAttributes<HTMLAnchorElement> {
 const NavLink = ({ children, ...props }: NavLinkProps) => {
   return (
     <a
-      className="text-sm md:text-base text-white px-4 py-2 text-stone-400 font-semibold hover:text-white hover:bg-stone-800 rounded-lg text-lg transition-all focus:bg-stone-800 focus:text-white"
+      className="text-sm md:text-base text-white px-4 py-2 text-zinc-400 font-semibold hover:text-white hover:bg-zinc-800 rounded-lg text-lg transition-all focus:bg-zinc-800 focus:text-white"
       {...props}
     >
       {children}
@@ -31,9 +31,6 @@ export const Navbar = () => {
       <ul className="flex flex-row gap-2 md:gap-4 items-center">
         <li>
           <NavLink href="/blog">Blog</NavLink>
-        </li>
-        <li>
-          <NavLink href="/about">About</NavLink>
         </li>
 
         <li>

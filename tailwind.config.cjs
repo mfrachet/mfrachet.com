@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter var", ...defaultTheme.fontFamily.sans],
+        sans: ["Tahoma", "Inter var", ...defaultTheme.fontFamily.sans],
       },
       keyframes: {
         "opacity-appearing": {

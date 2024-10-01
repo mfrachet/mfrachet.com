@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from "astro:transitions";
 import { Analytics } from "@vercel/analytics/react";
 import { Banner } from "../components/Banner";
 import { Container } from "../components/Container";
@@ -46,15 +47,11 @@ const description =
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={title} />
+    <ViewTransitions />
   </head>
-  <body class="min-h-full h-full bg-stone-900 pb-4 md:pb-12">
+  <body class="min-h-full h-full bg-zinc-900 pb-4 md:pb-12">
     <Banner>
-      <span
-        aria-label="An orange pumpkin carved into the shape of a face and commonly known as a Jack-o'-lantern"
-      >
-        🎃
-      </span>
-      Hey there, want to get in touch?{" "}
+      Want to get in touch?{" "}
       <Link href="mailto:marvin@frachet.eu" target="_blank" variant="light">
         marvin@frachet.eu
       </Link>
@@ -72,5 +69,9 @@ const description =
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    letter-spacing: 0.03em;
   }
 </style>

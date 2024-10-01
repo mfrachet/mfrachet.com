@@ -8,6 +8,8 @@ import meSrc from "../assets/me.jpg";
 import { getAllPosts } from "../modules/posts/services/getAllposts";
 import { PostList } from "../modules/posts/components/PostList";
 import { Link } from "../components/Link";
+import { Image } from "astro:assets";
+import { Title } from "../components/Title";
 
 const POST_TO_SHOW_HOMEPAGE = 3;
 const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
@@ -16,68 +18,34 @@ const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
 <Layout title="Marvin Frachet, Frontend Engineer">
   <main>
     <Container>
-      <div
-        class="py-8 md:py-20 grid md:grid-cols-2 gap-4 md:gap-20 items-center"
-      >
-        <div>
-          <Text
-            as="h1"
-            className="text-3xl md:text-5xl	motion-safe:animate-fade-enter-bottom font-bold"
-          >
-            Shipping things fast & testing automation
-          </Text>
+      <div class="text-center flex flex-col items-center">
+        <Image
+          src={meSrc}
+          alt="Marvin Frachet (me)"
+          quality={100}
+          class="rounded-full aspect-ratio border-8 border-white h-72 w-72 object-cover object-right"
+        />
 
-          <div
-            class="motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
-            style={{
-              animationDelay: "200ms",
-            }}
-          >
-            <Text
-              as="p"
-              className="text-xl md:text-2xl pt-2 md:pt-4 !text-stone-400"
-            >
-              Also learning about accessibility. Secretly dreaming of becoming
-              an IT teacher.
-            </Text>
-          </div>
-        </div>
+        <Text as="h1" className="text-3xl md:text-5xl	font-bold pt-4">
+          Marvin Frachet
+        </Text>
 
-        <div class="relative md:pb-20 md:pr-20">
-          <img
-            src={meSrc.src}
-            alt="Marvin Frachet (me)"
-            class="rounded-3xl relative z-10 md:h-[330px] md:w-[440px] motion-safe:opacity-0 motion-safe:animate-opacity-appearing"
-            style={{
-              animationDelay: "500ms",
-            }}
-          />
-
-          <div
-            aria-hidden
-            class="hidden md:block absolute top-0 h-[330px] w-[440px] motion-safe:opacity-0 motion-safe:animate-card-move"
-            style={{
-              animationDelay: "800ms",
-            }}
-          >
-            <Card>&nbsp;</Card>
-          </div>
-        </div>
+        <Text as="p" className="text-xl md:text-2xl pt-2 !text-zinc-400 ">
+          Frontend Engineer building things with React & friends.
+        </Text>
       </div>
 
-      <WhoIAm />
+      <div class="py-12 md:py-40 max-w-4xl mx-auto">
+        <WhoIAm />
+      </div>
 
-      <section class="pt-8 md:py-20">
+      <section>
         <div
-          class="flex flex-col md:flex-row md:items-center justify-between pb-4"
+          class="flex flex-col md:flex-row md:items-center justify-between pb-8"
         >
-          <Text as="h2" className="text-2xl md:text-3xl">
-            Latest posts that might interest you
-          </Text>
+          <Title as="h2" className="text-3xl"> Latest posts </Title>
 
-          <div class="text-xl pt-4 md:pt-0">
-            <Link href="/blog">See all posts</Link>
-          </div>
+          <Link href="/blog">See all posts</Link>
         </div>
         <PostList posts={latestPosts} client:visible />
       </section>

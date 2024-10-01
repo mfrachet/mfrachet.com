@@ -5,13 +5,13 @@ export interface CardProps {
 
 export const Card = ({ children, onClick }: CardProps) => {
   const clickableStyles = onClick
-    ? "hover:outline outline-offset-2 outline-4 cursor-pointer outline-stone-600 active:bg-stone-900 active:outline-stone-700"
+    ? "hover:outline outline-offset-2 outline-4 cursor-pointer outline-zinc-600 active:bg-zinc-900 active:outline-zinc-700"
     : "";
 
   return (
     <div
       onClick={onClick}
-      className={`rounded-3xl bg-stone-800 h-full transition-all ${clickableStyles}`}
+      className={`rounded-3xl bg-zinc-800 h-full transition-all ${clickableStyles}`}
     >
       {children}
     </div>

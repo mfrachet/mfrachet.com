@@ -4,7 +4,7 @@ export interface BannerProps {
 
 export const Banner = ({ children }: BannerProps) => {
   return (
-    <div className="py-2 px-4 text-center bg-orange-300 text-slate-900">
+    <div className="py-2 px-4 text-center bg-orange-200 text-zinc-900">
       {children}
     </div>
   );

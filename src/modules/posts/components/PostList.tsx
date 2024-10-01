@@ -7,7 +7,7 @@ export interface PostListProps {
 
 export const PostList = ({ posts }: PostListProps) => {
   return (
-    <ol className="grid md:grid-cols-3 gap-4 md:gap-12">
+    <ol className="grid md:grid-cols-3 gap-4">
       {posts.map((post) => (
         <li className="h-full" key={post.id}>
           <article className="h-full">

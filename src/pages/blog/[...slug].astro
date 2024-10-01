@@ -38,32 +38,20 @@ const formattedDate = formatter.format(entry.data.date);
 <Layout title={entry.data.title}>
   <main>
     <div class="mx-auto px-4 max-w-3xl">
-      <BackLink href="/blog">Back to blog</BackLink>
+      <Text as="time" className="!text-zinc-400 text-xl pt-4 block ">
+        {formattedDate}
+      </Text>
 
-      <div
-        class="motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom pt-8 md:pt-20"
-      >
-        <Text as="time" className="!text-stone-400 text-xl pt-4 block ">
-          {formattedDate}
-        </Text>
-      </div>
-
-      <div
-        class="motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
-        style={{ animationDelay: "300ms" }}
-      >
-        <Text as="h1" className="text-3xl md:text-5xl pb-8 font-semibold">
-          {entry.data.title}
-        </Text>
-      </div>
+      <Text as="h1" className="text-3xl md:text-5xl pb-8 font-semibold">
+        {entry.data.title}
+      </Text>
     </div>
 
     <div class="max-w-5xl mx-auto">
       <img
         src={cover}
         alt=""
-        class="md:rounded-3xl md:h-[600px] w-full object-cover motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
-        style={{ animationDelay: "500ms" }}
+        class="md:rounded-3xl md:h-[600px] w-full object-cover"
       />
     </div>
   </main>

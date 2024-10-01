@@ -1,40 +1,40 @@
-import { Link } from "../components/Link";
 import { Text } from "../components/Text";
-import me2Src from "../assets/me-2.jpg";
+import { Title } from "../components/Title";
 
 export const WhoIAm = () => {
   return (
-    <section className="py-8 md:py-20">
-      <div className="md:grid md:grid-cols-2 gap-4 md:gap-20 items-center">
-        <div>
-          <img
-            src={me2Src.src}
-            alt="Marvin Fracher (me)"
-            className="hidden md:block rounded-3xl h-[390px] w-[520px] motion-safe:opacity-0 motion-safe:animate-opacity-appearing"
-            style={{
-              animationDelay: "1200ms",
-            }}
-          />
-        </div>
-        <div>
-          <Text as="h2" className="text-2xl md:text-3xl">
-            Hey there, I'm Marvin
-          </Text>
+    <section className="py-8 md:py-20 px-8 md:px-20 border-4 border-zinc-500 rounded-3xl">
+      <Title as="h2" className="text-3xl">
+        <span aria-hidden>👋</span> Hello, my name is Marvin
+      </Title>
 
-          <Text
-            as="p"
-            className="text-xl md:text-2xl pt-2 pb-4 md:py-4 !text-stone-400"
+      <Text
+        as="div"
+        className="text-base md:text-2xl pt-2 pb-4 md:py-4 !text-zinc-400 flex flex-col gap-6"
+      >
+        <p className="leading-relaxed">
+          A French frontend engineer building things with React & React Native.
+        </p>
+        <p className="leading-relaxed">
+          I'm also a proud father of{" "}
+          <a
+            href="/blog/en/the-day-that-changed-everything"
+            className="text-white underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            I'm building apps with React and React native. When I step back from
-            the code editor, you can find me chilling with my family & friends,
-            or boxing on the ring.
-          </Text>
-
-          <div className="text-xl">
-            <Link href="/about">Learn more</Link>
-          </div>
-        </div>
-      </div>
+            a little boy with Down syndrome
+          </a>
+          , a husband, and someone who enjoys boxing, staying active, and always
+          learning.
+        </p>
+        <p className="leading-relaxed">
+          My goal is to help people by creating truly accessible software for
+          everyone—because accessibility isn't a tradeoff. I'm also enthusiastic
+          about testing automation, ensuring that everything I develop is
+          reliable and efficient.
+        </p>
+      </Text>
     </section>
   );
 };

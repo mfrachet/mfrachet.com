@@ -4,7 +4,6 @@ import { Link } from "../../../components/Link";
 import { Text } from "../../../components/Text";
 import type { Post } from "../types";
 import { Tag } from "../../../components/Tag";
-import { JobCard } from "../../curiculum/components/JobCard";
 import { PostCard } from "./PostCard";
 
 export interface PostHighlightProps {
@@ -28,27 +27,19 @@ export const PostHighlight = ({ post }: PostHighlightProps) => {
         >
           <article className="p-16 grid grid-cols-[2fr_1fr] gap-12">
             <div className="flex flex-col">
-              <div
-                className="flex-1 motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
-                style={{ animationDelay: "300ms" }}
-              >
+              <div className="flex-1">
                 <Tag>Latest article</Tag>
                 <Text as="h2" className="pt-4 text-5xl">
                   {post?.data.title}
                 </Text>
-                <Text as="time" className="!text-stone-400 text-xl pt-4 block">
+                <Text as="time" className="!text-zinc-400 text-xl pt-4 block">
                   {post?.formattedDate}
                 </Text>
               </div>
 
-              <div
-                className="motion-safe:opacity-0 motion-safe:animate-fade-enter-bottom"
-                style={{ animationDelay: "600ms" }}
-              >
-                <Link href={`/blog/${post?.slug}`} ref={linkRef}>
-                  Read the article
-                </Link>
-              </div>
+              <Link href={`/blog/${post?.slug}`} ref={linkRef}>
+                Read the article
+              </Link>
             </div>
 
             <div>

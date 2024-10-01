@@ -10,12 +10,12 @@ export interface LinkProps {
 
 const variantClasses = {
   light: {
-    text: "text-stone-800 hover:text-stone-900",
-    border: "border-stone-800 group-hover:border-stone-900",
+    text: "text-zinc-800 hover:text-zinc-900",
+    border: "border-zinc-800 group-hover:border-zinc-900",
   },
   dark: {
-    text: "text-stone-300 hover:text-white",
-    border: " border-stone-300 group-hover:border-b-white",
+    text: "text-zinc-300 hover:text-white",
+    border: " border-zinc-300 group-hover:border-b-white",
   },
 };
 

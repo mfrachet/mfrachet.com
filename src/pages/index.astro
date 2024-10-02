@@ -10,6 +10,7 @@ import { PostList } from "../modules/posts/components/PostList";
 import { Link } from "../components/Link";
 import { Image } from "astro:assets";
 import { Title } from "../components/Title";
+import Hero from "../components/Hero.astro";
 
 const POST_TO_SHOW_HOMEPAGE = 3;
 const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
@@ -17,8 +18,8 @@ const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
 
 <Layout title="Marvin Frachet, Frontend Engineer">
   <main>
-    <Container>
-      <div class="text-center flex flex-col items-center">
+    <Hero>
+      <div class="text-center flex flex-col items-center px-4">
         <Image
           src={meSrc}
           alt="Marvin Frachet (me)"
@@ -34,7 +35,9 @@ const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
           Frontend Engineer building things with React & friends.
         </Text>
       </div>
+    </Hero>
 
+    <Container>
       <div class="py-12 md:py-40 max-w-4xl mx-auto">
         <WhoIAm />
       </div>

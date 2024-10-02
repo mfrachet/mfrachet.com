@@ -44,7 +44,7 @@ const optimizeImages = async () => {
     )}`;
 
     const coverPathPromise = sharp(path)
-      .resize({ height: 1200 })
+      .resize({ height: 600 })
       .rotate()
       .jpeg({ mozjpeg: true })
       .toFile(coverPath);

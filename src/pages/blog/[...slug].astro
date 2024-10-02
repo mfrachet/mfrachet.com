@@ -1,9 +1,7 @@
 ---
-import { getCollection, getEntry } from "astro:content";
-import { Link } from "../../components/Link";
+import { getEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { Text } from "../../components/Text";
-import { BackLink } from "../../components/BackLink";
 import { GithubIssueLink } from "../../components/GithubIssueLink";
 import { getAllPosts } from "../../modules/posts/services/getAllposts";
 import {
@@ -35,36 +33,22 @@ const formatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
 const formattedDate = formatter.format(entry.data.date);
 ---
 
-<Layout title={entry.data.title}>
-  <main class="pt-48 lg:pt-40">
-    <div class="mx-auto px-4 max-w-4xl">
-      <Text as="time" className="!text-zinc-400 text-xl pt-4 block ">
-        {formattedDate}
-      </Text>
+<Layout title={entry.data.title} heroImage={cover}>
+  <main
+    class="px-4 mx-auto prose-pre:!leading-5 prose-code:text-sm prose-code:px-1 prose lg:prose-xl prose-invert md:prose-pre:-mx-10 prose-pre:rounded-xl prose-img:rounded-xl pb-12"
+  >
+    <Text as="time" className="!text-zinc-400 text-xl pt-4 block ">
+      {formattedDate}
+    </Text>
 
-      <Text
-        as="h1"
-        className="text-3xl md:text-5xl pb-8 font-semibold text-balance"
-      >
-        {entry.data.title}
-      </Text>
-    </div>
-
-    <div class="max-w-5xl mx-auto">
-      <img
-        src={cover}
-        alt=""
-        class="md:rounded-3xl md:h-[600px] w-full object-cover"
-      />
-    </div>
-  </main>
-
-  <div class="mx-auto px-4 max-w-3xl pt-8 md:pt-12">
-    <div
-      class="prose-pre:!leading-5 prose-code:text-sm prose-code:px-1 prose lg:prose-xl prose-invert md:prose-pre:-mx-10 prose-pre:rounded-xl prose-img:rounded-xl pb-12"
+    <Text
+      as="h1"
+      className="text-3xl md:text-5xl pb-6 font-semibold text-balance"
     >
-      <Content />
-    </div>
+      {entry.data.title}
+    </Text>
+
+    <Content />
 
     <GithubIssueLink
       title={`Suggestions for: ${entry.data.title}`}
@@ -88,5 +72,5 @@ const formattedDate = formatter.format(entry.data.date);
         )
       }
     </div>
-  </div>
+  </main>
 </Layout>

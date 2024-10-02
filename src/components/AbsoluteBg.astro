@@ -1,0 +1,19 @@
+---
+import { Image } from "astro:assets";
+
+export interface HeroProps {
+  image?: string;
+}
+
+const { image } = Astro.props;
+---
+
+<div class="absolute w-full">
+  <div class="relative inset-0 image-container">
+    <img
+      src={image}
+      alt=""
+      class="w-full h-[600px] object-cover object-center"
+    />
+  </div>
+</div>

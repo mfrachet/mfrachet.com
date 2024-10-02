@@ -5,12 +5,14 @@ import { Banner } from "../components/Banner";
 import { Container } from "../components/Container";
 import { Navbar } from "../components/Navbar";
 import { Link } from "../components/Link";
+import AbsoluteBg from "../components/AbsoluteBg.astro";
 
 interface Props {
   title: string;
+  heroImage?: string;
 }
 
-const { title } = Astro.props;
+const { title, heroImage } = Astro.props;
 
 const ogImage = "/og.jpeg";
 
@@ -50,19 +52,25 @@ const description =
     <ViewTransitions />
   </head>
   <body class="min-h-full h-full bg-zinc-900 pb-4 md:pb-12">
-    <Banner>
-      Want to get in touch?{" "}
-      <Link href="mailto:marvin@frachet.eu" target="_blank" variant="light">
-        marvin@frachet.eu
-      </Link>
-    </Banner>
+    {heroImage && <AbsoluteBg image={heroImage} />}
 
-    <Container>
-      <Navbar />
-    </Container>
-    <div>
-      <slot />
+    <div class="relative z-10">
+      <Banner>
+        Want to get in touch?{" "}
+        <Link href="mailto:marvin@frachet.eu" target="_blank" variant="light">
+          marvin@frachet.eu
+        </Link>
+      </Banner>
+
+      <Container>
+        <Navbar />
+      </Container>
+
+      <div class="pt-48 lg:pt-40">
+        <slot />
+      </div>
     </div>
+
     <Analytics client:load />
   </body>
 </html>
@@ -75,5 +83,21 @@ const description =
 
   * {
     letter-spacing: 0.03em;
+  }
+
+  .image-container img {
+    display: block;
+    width: 100%;
+  }
+
+  .image-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), #18181b);
+    pointer-events: none; /* Make sure gradient overlay doesn't interfere with clicks */
   }
 </style>

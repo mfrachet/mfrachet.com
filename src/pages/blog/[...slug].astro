@@ -37,12 +37,15 @@ const formattedDate = formatter.format(entry.data.date);
 
 <Layout title={entry.data.title}>
   <main>
-    <div class="mx-auto px-4 max-w-3xl">
+    <div class="mx-auto px-4 max-w-4xl">
       <Text as="time" className="!text-zinc-400 text-xl pt-4 block ">
         {formattedDate}
       </Text>
 
-      <Text as="h1" className="text-3xl md:text-5xl pb-8 font-semibold">
+      <Text
+        as="h1"
+        className="text-3xl md:text-5xl pb-8 font-semibold text-balance"
+      >
         {entry.data.title}
       </Text>
     </div>

@@ -22,10 +22,12 @@ export const Navbar = () => {
   return (
     <nav
       aria-label="Main navigation"
-      className="py-12 md:py-20 flex flex-col md:flex-row items-center justify-between"
+      className="py-4 flex flex-col md:flex-row items-center justify-between"
     >
       <a href="/" className="pb-8 md:pb-0">
-        <Text className="text-2xl border-b-2 border-white pb-1">mfrachet</Text>
+        <Text className="text-2xl border-b-2 border-white pb-1" as="span">
+          @mfrachet
+        </Text>
       </a>
 
       <ul className="flex flex-row gap-2 md:gap-4 items-center">

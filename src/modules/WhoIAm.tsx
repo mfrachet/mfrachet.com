@@ -20,8 +20,6 @@ export const WhoIAm = () => {
           <a
             href="/blog/en/the-day-that-changed-everything"
             className="text-white underline"
-            target="_blank"
-            rel="noopener noreferrer"
           >
             a little boy with Down syndrome
           </a>

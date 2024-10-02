@@ -60,7 +60,9 @@ const description =
     <Container>
       <Navbar />
     </Container>
-    <slot />
+    <div class="pt-12">
+      <slot />
+    </div>
     <Analytics client:load />
   </body>
 </html>

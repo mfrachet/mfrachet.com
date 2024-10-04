@@ -3,6 +3,10 @@ title: Qualitative analytics and heatmaps
 date: 2024-10-04
 ---
 
+import { Image } from "astro:assets";
+
+import heatmap from "../../../assets/qualitative-analytics-and-heatmaps/hotjar.png";
+
 Analytics encompasses various forms and the collection of diverse data types.
 
 - **Product analytics**: they aim to measure the success of a product by analyzing user behavior and product usage.
@@ -24,3 +28,17 @@ Qualitative analytics is about understanding "how" people interact with your web
 ### ⚠️ Disclaimer
 
 Gathering qualitative data is very intrusive. You have to (and this is a legal requirement in Europe) to inform people that you are about to track them in a very extensive way.
+
+### Representing qualitative data
+
+Before understanding how to implement a solution to gather the qualitative data, let's try to find solution to represent the data in a meaningful way.
+
+### Heatmaps
+
+Heatmaps are a visual representation of zones that are active. The more the color is closed to red, the more the zone is active. The following is an image (taken from Hotjar) that shows a heatmap of a web page.
+
+<Image src={heatmap} alt="A heatmap taken from Hotjar " />
+
+### Click maps with clustering algorithm
+
+### Per element infobubble

@@ -100,4 +100,18 @@ const description =
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), #18181b);
     pointer-events: none; /* Make sure gradient overlay doesn't interfere with clicks */
   }
+
+  .anchor-link {
+    font-size: 0.8em;
+    opacity: 0.25;
+    margin-left: -1.3em;
+    margin-right: 0.4em;
+    transition: opacity 0.2s ease-in-out;
+    text-decoration: none;
+  }
+
+  .anchor-link:hover,
+  .anchor-link:focus {
+    opacity: 1;
+  }
 </style>

@@ -34,15 +34,19 @@ Gathering qualitative data is very intrusive. You have to (and this is a legal r
 
 Before understanding how to implement a solution to gather the qualitative data, let's try to find solution to represent the data in a meaningful way.
 
-### Heatmaps
+#### Heatmaps
 
 Heatmaps are a visual representation of zones that are active. The more the color is closed to red, the more the zone is active. The following is an image (taken from Hotjar) that shows a heatmap of a web page.
 
 <Image src={heatmap} alt="A heatmap taken from Hotjar " />
 
-### Click maps with clustering algorithm
+You can represent a heatmap using a JS library called [visual-heatmap](https://github.com/nswamy14/visual-heatmap). It will show the different zones with different colors depending the data count.
 
-### Per element infobubble
+You can also create something yourself using a [clustering algorithm](https://www.freecodecamp.org/news/8-clustering-algorithms-in-machine-learning-that-all-data-scientists-should-know/). It's a way to split the screen into different zones and count the number of clicks on each zone. The granularity depends on your needs. It generally quite not too hard to implement and avoid using an external library.
+
+#### Click maps with clustering algorithm
+
+#### Per element infobubble
 
 <div className="border border-zinc-800 rounded-xl px-8">
   <Image src={hotzone} alt="A per element infobubble on a given element " />

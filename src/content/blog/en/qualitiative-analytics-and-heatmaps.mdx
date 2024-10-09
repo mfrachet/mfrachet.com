@@ -20,15 +20,15 @@ What's fascinating about analytics is that they're always a bit biased.
 
 **Web analytics** only focus on the numbers and often miss the bigger picture. Sure, you might see a million visitors on your homepage, but those numbers don't tell you if people are interacting with the content in the way you intended. It's a bit like knowing how many guests came to a party without knowing if they had a good time!
 
-The common factor here is that they lack an element: they don't capture how people really interact with your website or product. Maybe your hero CTAs generates less "clicks" than the small contact button at the bottom of the page (this is a gross example, but you get the point)?
+The common factor here is that they lack an element: they don't capture **how people really interact with your website or product**. Maybe your hero CTAs generates less "clicks" than the small contact button at the bottom of the page (this is a gross example, but you get the point)?
 
 ## Introducing Qualitative Analytics
 
-Qualitative analytics is about understanding "how" people interact with your website or product. What element are they interacting with? Is it the one you expected? How to re-focus their attention where you want them to?
+Qualitative analytics is about understanding **how** people interact with your website or product. What element are they interacting with? Is it the one you expected? How to re-focus their attention where you want them to?
 
 ### ⚠️ Disclaimer
 
-Gathering qualitative data is very intrusive. You have to (and this is a legal requirement in Europe) to inform people that you are about to track them in a very extensive way.
+Gathering qualitative data is very intrusive. You have to (and [this is a legal requirement in Europe](https://gdpr-info.eu/)) to inform people that you are about to track them in a very extensive way.
 
 ### Representing qualitative data
 
@@ -42,12 +42,20 @@ Heatmaps are a visual representation of zones that are active. The more the colo
 
 You can represent a heatmap using a JS library called [visual-heatmap](https://github.com/nswamy14/visual-heatmap). It will show the different zones with different colors depending the data count.
 
-You can also create something yourself using a [clustering algorithm](https://www.freecodecamp.org/news/8-clustering-algorithms-in-machine-learning-that-all-data-scientists-should-know/). It's a way to split the screen into different zones and count the number of clicks on each zone. The granularity depends on your needs. It generally quite not too hard to implement and avoid using an external library.
-
-#### Click maps with clustering algorithm
+You can also create something yourself using a [clustering algorithm](https://www.freecodecamp.org/news/8-clustering-algorithms-in-machine-learning-that-all-data-scientists-should-know/). It's a way to split the screen into different zones and count the number of clicks on each zone. The granularity depends on your needs. It generally not too hard to implement and avoid using an external library.
 
 #### Per element infobubble
+
+Another approach that I find even more meaningful and interesting is to attach an infobubble to the element that is clicked (or that triggers an event that you are interested in).
+
+It offers clear insights into the engagement on a specific element, making it simple to visually compare different elements. Additionally, you get both textual and colored information.
 
 <div className="border border-zinc-800 rounded-xl px-8">
   <Image src={hotzone} alt="A per element infobubble on a given element " />
 </div>
+
+### Implementing a solution
+
+In this section, I will not show you how to use XYZ product (there are plenty if you [google it](https://www.google.com/search?q=web+heatmap+analytics+sdk)).
+
+Instead, I will show you how you can implement a solution using a minimal amount of code, uncovering the core mechanisms that you can then extend to your needs.

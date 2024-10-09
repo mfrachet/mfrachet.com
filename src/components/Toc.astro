@@ -1,0 +1,13 @@
+---
+import { type TocItem } from "../utils/generateToc";
+import TocList from "./TocList.astro";
+
+export interface Props {
+  title: string;
+  items: Array<TocItem>;
+}
+
+const { items } = Astro.props;
+---
+
+<TocList items={items} />

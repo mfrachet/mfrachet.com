@@ -37,49 +37,63 @@ const formattedDate = formatter.format(entry.data.date);
 const toc = generateToC(headings, {
   minHeadingLevel: 2,
   maxHeadingLevel: 6,
-  title: "Table of Contents",
+  title: "Go to top",
 });
+
+const proseClass =
+  "px-4 mx-auto prose-pre:!leading-5 prose-code:text-sm prose-code:px-1 prose lg:prose-xl prose-invert md:prose-pre:-mx-10 prose-pre:rounded-xl prose-img:rounded-xl pb-12";
 ---
 
 <Layout title={entry.data.title} heroImage={cover}>
-  <main
-    class="px-4 mx-auto prose-pre:!leading-5 prose-code:text-sm prose-code:px-1 prose lg:prose-xl prose-invert md:prose-pre:-mx-10 prose-pre:rounded-xl prose-img:rounded-xl pb-12"
-  >
-    <Text as="time" className="!text-zinc-400 text-xl pt-4 block ">
-      {formattedDate}
-    </Text>
+  <main class="max-w-6xl mx-auto">
+    <div class={proseClass}>
+      <Text as="time" className="!text-zinc-400 text-xl pt-4 block ">
+        {formattedDate}
+      </Text>
 
-    <Text
-      as="h1"
-      className="text-3xl md:text-5xl pb-6 font-semibold text-balance"
-    >
-      {entry.data.title}
-    </Text>
+      <Text
+        as="h1"
+        className="text-3xl md:text-5xl pb-6 font-semibold text-balance"
+      >
+        {entry.data.title}
+      </Text>
+    </div>
 
-    <Toc title={entry.data.title} items={toc} />
-    <Content />
+    <div class="flex flex-row min-h-0 max-w-6xl mx-auto gap-0">
+      <div class={proseClass}>
+        <Content />
+      </div>
 
-    <GithubIssueLink
-      title={`Suggestions for: ${entry.data.title}`}
-      body={`Link of the article: https://mfrachet.com/blog/${slug}`}
-    />
+      <div
+        class="prose lg:prose-xl prose-invert sticky top-32 !text-sm self-start"
+      >
+        <Toc title="Table of Contents" items={toc} />
+      </div>
+    </div>
 
-    <div class="flex flex-col md:flex-row gap-4 pt-2">
-      {
-        prevPost?.slug && (
-          <PreviousPostButton href={`/blog/${prevPost.slug}`}>
-            {prevPost.data.title}
-          </PreviousPostButton>
-        )
-      }
+    <div>
+      <GithubIssueLink
+        title={`Suggestions for: ${entry.data.title}`}
+        body={`Link of the article: https://mfrachet.com/blog/${slug}`}
+      />
 
-      {
-        nextPost?.slug && (
-          <NextPostButton href={`/blog/${nextPost.slug}`}>
-            {nextPost.data.title}
-          </NextPostButton>
-        )
-      }
+      <div class="flex flex-col md:flex-row gap-4 pt-2 w-full">
+        {
+          prevPost?.slug && (
+            <PreviousPostButton href={`/blog/${prevPost.slug}`}>
+              {prevPost.data.title}
+            </PreviousPostButton>
+          )
+        }
+
+        {
+          nextPost?.slug && (
+            <NextPostButton href={`/blog/${nextPost.slug}`}>
+              {nextPost.data.title}
+            </NextPostButton>
+          )
+        }
+      </div>
     </div>
   </main>
 </Layout>

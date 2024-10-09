@@ -1,0 +1,15 @@
+---
+import { type TocItem } from "../utils/generateToc";
+import TocList from "./TocList.astro";
+
+export interface Props {
+  title: string;
+  items: Array<TocItem>;
+}
+
+const { items } = Astro.props;
+---
+
+<div class="sticky top-5 pl-6 text-sm translate-x-full">
+  <TocList items={items} />
+</div>

@@ -8,6 +8,8 @@ import {
   PreviousPostButton,
   NextPostButton,
 } from "../../modules/posts/components/PostButton";
+import Toc from "../../components/Toc.astro";
+import { generateToC } from "../../utils/generateToc";
 // 1. Get the slug from the incoming server request
 const { slug } = Astro.params;
 if (slug === undefined) {
@@ -26,11 +28,17 @@ if (entry === undefined) {
   return Astro.redirect("/404");
 }
 // 4. (Optional) Render the entry to HTML in the template
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
 
 const cover = `/blog/${entry.slug}_cover.jpg`;
 const formatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
 const formattedDate = formatter.format(entry.data.date);
+
+const toc = generateToC(headings, {
+  minHeadingLevel: 2,
+  maxHeadingLevel: 6,
+  title: "Table of Contents",
+});
 ---
 
 <Layout title={entry.data.title} heroImage={cover}>
@@ -48,6 +56,7 @@ const formattedDate = formatter.format(entry.data.date);
       {entry.data.title}
     </Text>
 
+    <Toc title={entry.data.title} items={toc} />
     <Content />
 
     <GithubIssueLink

@@ -11,9 +11,18 @@ import { Image } from "astro:assets";
 import { Title } from "../components/Title";
 
 import bgSrc from "../assets/bg.jpg";
+import { hashId } from "../modules/flags/hashId";
+import { engine } from "../modules/flags/engine";
+import { getUserId } from "../modules/flags/getUserId";
 
 const POST_TO_SHOW_HOMEPAGE = 3;
 const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
+
+const userCtx = engine.createUserContext({
+  __id: getUserId(Astro),
+});
+
+const variant = userCtx.evaluate("homepage-variant");
 ---
 
 <Layout title="Marvin Frachet, Frontend Engineer" heroImage={bgSrc.src}>

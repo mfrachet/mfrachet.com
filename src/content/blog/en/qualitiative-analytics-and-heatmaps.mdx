@@ -26,15 +26,15 @@ The common factor here is that they lack an element: they don't capture **how pe
 
 Qualitative analytics is about understanding **how** people interact with your website or product. What element are they interacting with? Is it the one you expected? How to re-focus their attention where you want them to?
 
-### ⚠️ Disclaimer
+## ⚠️ Disclaimer
 
 Gathering qualitative data is very intrusive. You have to (and [this is a legal requirement in Europe](https://gdpr-info.eu/)) to inform people that you are about to track them in a very extensive way.
 
-### Representing qualitative data
+## Representing qualitative data
 
 Before understanding how to implement a solution to gather the qualitative data, let's try to find solution to represent the data in a meaningful way.
 
-#### Heatmaps
+### Heatmaps
 
 Heatmaps are a visual representation of zones that are active. The more the color is closed to red, the more the zone is active. The following is an image (taken from Hotjar) that shows a heatmap of a web page.
 
@@ -44,7 +44,7 @@ You can represent a heatmap using a JS library called [visual-heatmap](https://g
 
 You can also create something yourself using a [clustering algorithm](https://www.freecodecamp.org/news/8-clustering-algorithms-in-machine-learning-that-all-data-scientists-should-know/). It's a way to split the screen into different zones and count the number of clicks on each zone. The granularity depends on your needs. It generally not too hard to implement and avoid using an external library.
 
-#### Per element infobubble
+### Per element infobubble
 
 Another approach that I find even more meaningful and interesting is to attach an infobubble to the element that is clicked (or that triggers an event that you are interested in).
 
@@ -54,8 +54,46 @@ It offers clear insights into the engagement on a specific element, making it si
   <Image src={hotzone} alt="A per element infobubble on a given element " />
 </div>
 
-### Implementing a solution
+## Implementing a solution
 
 In this section, I will not show you how to use XYZ product (there are plenty if you [google it](https://www.google.com/search?q=web+heatmap+analytics+sdk)).
 
-Instead, I will show you how you can implement a solution using a minimal amount of code, uncovering the core mechanisms that you can then extend to your needs.
+Instead, I will show you how you can implement a solution, uncovering the core mechanisms that you can then extend to your needs and learn from.
+
+### What do we assume
+
+We assume that there is an operational backend and a database capable of receiving analytics events in a specific format. The key field for our purposes is the `selector` field, which indicates the element that has been interacted with.
+
+### What do we need to do?
+
+- A JS library that shows the heatmap/infobubble on the page.
+- A JS library that tracks user interactions and that loads the heatmap/infobubble script on the page when needed (we'll see why and how)
+
+#### A JS library that shows the heatmap/infobubble on the page
+
+The tradeoff I'm okay to make while creating this lib is: it's okay if it's "big".
+
+_Why it's not so important?_
+
+This script (which displays the infobubble) will only be loaded on the webpage under very specific conditions: indeed, it's the analytics script (the one sending the events) that will append it to the DOM when they see a very specific URL.
+
+A larger bundle size is helpful because it enables me to initiate a complete application (such as in React or Vue), simplifying the library creation process.
+
+##### How to get the bubbles?
+
+To get the bubbles, we need to fetch the data from the backend. We admit the backend is ready and allows us to do so. Here's the backend API:
+
+- GET `/api/analytics/bubbles` requiring an `Authorization` header with a valid token
+- The response is an `Array<{selector: string, count: number}>`
+
+"Hold on, I've developed a custom analytics platform, and the script is meant to load on an application that I don't manage. How can I obtain the authorization header?""
+
+Yes, you're right.
+
+In general, when someone uses a third party service that provides heatmaps, in the dashboard the person will find a link that will redirect them to their application - with an extra parameter in the URL.
+
+This extra parameters is a "short living token". It can be used for a small period of time to fetch the bubbles. It's generally attached to the URL via a hash fragment instead of a query parameter.
+
+Why?
+
+When a webpage is loaded with a hash fragment, the browser does not send the hash value to the server. It's a small detail, but it's a security feature.

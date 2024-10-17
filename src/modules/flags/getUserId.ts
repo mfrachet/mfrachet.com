@@ -7,5 +7,5 @@ export const getUserId = (Astro: AstroGlobal) => {
 
   const userId = hashId(`${userAgent}-${ipAddress}`);
 
-  return userId;
+  return { userId, userAgent, ipAddress };
 };

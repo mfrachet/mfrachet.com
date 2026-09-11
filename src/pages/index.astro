@@ -13,7 +13,6 @@ import { Title } from "../components/Title";
 import bgSrc from "../assets/bg.jpg";
 import { engine } from "../modules/flags/engine";
 import { getUserId } from "../modules/flags/getUserId";
-import { track } from "../modules/analytics/mixpanel";
 
 const POST_TO_SHOW_HOMEPAGE = 3;
 const latestPosts = (await getAllPosts()).slice(0, POST_TO_SHOW_HOMEPAGE);
@@ -25,8 +24,6 @@ const userCtx = engine.createUserContext({
 });
 
 const variant = userCtx.evaluate("homepage-variant");
-
-track(userId, "homepage-view", { variant, userAgent, ipAddress });
 ---
 
 <Layout title="Marvin Frachet, Frontend Engineer" heroImage={bgSrc.src}>

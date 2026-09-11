@@ -1,11 +1,12 @@
 ---
-import { ViewTransitions } from "astro:transitions";
-import { Analytics } from "@vercel/analytics/react";
+import { ClientRouter } from "astro:transitions";
+import Analytics from "@vercel/analytics/astro";
 import { Banner } from "../components/Banner";
 import { Container } from "../components/Container";
 import { Navbar } from "../components/Navbar";
 import { Link } from "../components/Link";
 import AbsoluteBg from "../components/AbsoluteBg.astro";
+import "../styles/global.css";
 
 interface Props {
   title: string;
@@ -49,7 +50,7 @@ const description =
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={title} />
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body class="min-h-full h-full bg-zinc-900 pb-4 md:pb-12">
     {heroImage && <AbsoluteBg image={heroImage} />}
@@ -71,7 +72,7 @@ const description =
       </div>
     </div>
 
-    <Analytics client:load />
+    <Analytics />
   </body>
 </html>
 <style is:global>

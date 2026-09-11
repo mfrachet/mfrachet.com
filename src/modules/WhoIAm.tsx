@@ -10,7 +10,7 @@ export const WhoIAm = () => {
 
       <Text
         as="div"
-        className="text-base md:text-2xl pt-2 pb-4 md:py-4 !text-zinc-400 flex flex-col gap-6"
+        className="text-base md:text-2xl pt-2 pb-4 md:py-4 text-zinc-400! flex flex-col gap-6"
       >
         <p className="leading-relaxed">
           A French frontend engineer building things with React & React Native.

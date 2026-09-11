@@ -22,7 +22,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         className="object-cover w-full rounded-t-3xl"
       />
       <div className="p-8">
-        <Text as="time" className="!text-zinc-400 text-sm block">
+        <Text as="time" className="text-zinc-400! text-sm block">
           {post?.formattedDate}
         </Text>
 
@@ -30,7 +30,7 @@ export const PostCard = ({ post }: PostCardProps) => {
           {post.data.title}
         </Text>
 
-        <Link ref={linkRef} href={`/blog/${post?.slug}`}>
+        <Link ref={linkRef} href={`/blog/${post?.id}`}>
           Read the article
         </Link>
       </div>

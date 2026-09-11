@@ -1,5 +1,5 @@
 ---
-import { getEntry } from "astro:content";
+import { getEntry, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { Text } from "../../components/Text";
 import { GithubIssueLink } from "../../components/GithubIssueLink";
@@ -17,7 +17,7 @@ if (slug === undefined) {
 const entry = await getEntry("blog", slug);
 const entries = await getAllPosts();
 
-const index = entries.findIndex((e) => e.slug === slug);
+const index = entries.findIndex((e) => e.id === slug);
 const prevPost = index > 0 ? entries.at(index - 1) : undefined;
 const nextPost = entries.at(index + 1);
 
@@ -26,18 +26,18 @@ if (entry === undefined) {
   return Astro.redirect("/404");
 }
 // 4. (Optional) Render the entry to HTML in the template
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 
-const cover = `/blog/${entry.slug}_cover.jpg`;
+const cover = `/blog/${entry.id}_cover.jpg`;
 const formatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
 const formattedDate = formatter.format(entry.data.date);
 ---
 
 <Layout title={entry.data.title} heroImage={cover}>
   <main
-    class="px-4 mx-auto prose-pre:!leading-5 prose-code:text-sm prose-code:px-1 prose lg:prose-xl prose-invert md:prose-pre:-mx-10 prose-pre:rounded-xl prose-img:rounded-xl pb-12"
+    class="px-4 mx-auto prose-pre:leading-5! prose-code:text-sm prose-code:px-1 prose max-w-[80ch] prose-invert md:prose-pre:-mx-10 prose-pre:rounded-xl prose-img:rounded-xl pb-12"
   >
-    <Text as="time" className="!text-zinc-400 text-xl pt-4 block ">
+    <Text as="time" className="text-zinc-400! text-xl pt-4 block ">
       {formattedDate}
     </Text>
 
@@ -57,16 +57,16 @@ const formattedDate = formatter.format(entry.data.date);
 
     <div class="flex flex-col md:flex-row gap-4 pt-2">
       {
-        prevPost?.slug && (
-          <PreviousPostButton href={`/blog/${prevPost.slug}`}>
+        prevPost?.id && (
+          <PreviousPostButton href={`/blog/${prevPost.id}`}>
             {prevPost.data.title}
           </PreviousPostButton>
         )
       }
 
       {
-        nextPost?.slug && (
-          <NextPostButton href={`/blog/${nextPost.slug}`}>
+        nextPost?.id && (
+          <NextPostButton href={`/blog/${nextPost.id}`}>
             {nextPost.data.title}
           </NextPostButton>
         )

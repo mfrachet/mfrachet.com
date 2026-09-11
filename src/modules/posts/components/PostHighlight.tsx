@@ -32,12 +32,12 @@ export const PostHighlight = ({ post }: PostHighlightProps) => {
                 <Text as="h2" className="pt-4 text-5xl">
                   {post?.data.title}
                 </Text>
-                <Text as="time" className="!text-zinc-400 text-xl pt-4 block">
+                <Text as="time" className="text-zinc-400! text-xl pt-4 block">
                   {post?.formattedDate}
                 </Text>
               </div>
 
-              <Link href={`/blog/${post?.slug}`} ref={linkRef}>
+              <Link href={`/blog/${post?.id}`} ref={linkRef}>
                 Read the article
               </Link>
             </div>

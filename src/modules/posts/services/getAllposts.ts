@@ -9,7 +9,7 @@ export const getAllPosts = async () => {
       return {
         ...blog,
         formattedDate: formatter.format(blog.data.date),
-        thumbnail: `/blog/${blog.slug}_thumbnail.jpg`,
+        thumbnail: `/blog/${blog.id}_thumbnail.jpg`,
       };
     });
 
